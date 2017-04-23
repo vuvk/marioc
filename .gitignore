@@ -31,3 +31,13 @@
 # Debug files
 *.dSYM/
 *.su
+*.save
+
+bin/*
+
+# Folders
+!bin/media
+inc
+lib
+obj
+share
