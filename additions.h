@@ -21,7 +21,6 @@ bool FileExists (const char* fileName)
     }
 }
 
-
 void Swapi (int* a, int* b)
 {
     int t = *a;
@@ -34,4 +33,23 @@ void Swapf (float* a, float* b)
     float t = *a;
     *a = *b;
     *b = t;
+}
+
+
+void LimitShort (short* a, short min, short max)
+{
+    if (*a < min) *a = min;
+    if (*a > max) *a = max;
+}
+
+void LimitInt (int* a, int min, int max)
+{
+    if (*a < min) *a = min;
+    if (*a > max) *a = max;
+}
+
+void LimitFloat (float* a, float min, float max)
+{
+    if (*a < min) *a = min;
+    if (*a > max) *a = max;
 }

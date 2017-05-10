@@ -24,19 +24,23 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Wall" />
 			<Add directory="./inc" />
 		</Compiler>
 		<Linker>
-			<Add option="-lSDL2main -lSDL2 -lSDL2_image" />
+			<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
 			<Add directory="./lib" />
 		</Linker>
 		<Unit filename="additions.h" />
+		<Unit filename="corpse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="corpse.h" />
 		<Unit filename="creature.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -56,10 +60,21 @@
 		<Unit filename="mario.cbp" />
 		<Unit filename="mario.depend" />
 		<Unit filename="mario.layout" />
+		<Unit filename="physObj.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="physObj.h" />
 		<Unit filename="player.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="player.h" />
+		<Unit filename="sound.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sound.h" />
+		<Unit filename="texture.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="texture.h" />
 		<Unit filename="vector2d.c">
 			<Option compilerVar="CC" />

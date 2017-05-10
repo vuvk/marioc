@@ -37,6 +37,7 @@ bin/*
 
 # Folders
 !bin/media
+!bin/media
 inc
 lib
 obj

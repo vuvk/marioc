@@ -3,6 +3,7 @@
 #include "SDL2/SDL.h"
 
 #include "level.h"
+#include "physObj.h"
 
 typedef enum
 {
@@ -16,55 +17,55 @@ typedef enum
 typedef struct
 {
     ECreatureType creatureType;
-    int health;
+    short health;
 
-    /* позиция и позиция центра */
-    SVector2f pos;
+    unsigned short physBodyIndex;
+    //SPhysObject* physBody;
+    /*SVector2f pos;
     SVector2f center;
-    /* размеры */
     int w, h;
     int halfW, halfH;
+    SVector2f impulse;*/
 
-    /* движение */
-    SVector2f impulse;
+    char xDir;           /* -1 влево 1 вправо*/
+    float moveSpeed;     /* скорость движения максимальная */
+    float accelSpeed;    /* ускорение */
 
-    int xDir;           /* -1 влево 1 вправо*/
-    float moveSpeed;    /* скорость движения максимальная */
-    float accelSpeed;   /* ускорение */
-
-    float friction;
-    bool isGrounded;
+    /*float friction;
+    bool isGrounded;*/
 
     /* текстуры */
     SDL_Texture** textures;
-    int texCount;
+    unsigned short texCount;
 
     /* анимация */
-    int startFrame, endFrame;
-    int curFrame;
+    short startFrame, endFrame;
+    short curFrame;
     float animSpeed;    /* чем меньше, тем быстрее анимация! */
-    float animDelay;   /* здесь идет наращение времени до смены кадра */
+    float animDelay;    /* здесь идет наращение времени до смены кадра */
 } SCreature;
 
 /* набор всех созданий */
 /* ЗАМЕНИТЬ НА СПИСОК! */
 SCreature* creatures [MAX_CREATURES_COUNT];
-int creaturesCount;
+unsigned short creaturesCount;
 
 /* имитация конструктора */
 SCreature* CreatureCreate (ECreatureType creatureType,
-                           int health,
+                           short health,
                            float x, float y,
-                           int w, int h,
+                           byte w, int h,
                            float moveSpeed,
                            SDL_Texture** textures,
-                           int texCount,
+                           unsigned short texCount,
                            float animSpeed);
 /* имитация деструктора */
-void CreatureDestroy (SCreature* creature);
+void CreatureDestroy (SCreature** creature);
 void CreatureClearAll ();
 
-void CreatureUpdateMove (SCreature* creature);
+void CreatureGetDamage (SCreature* creature, int damage);
+
+void CreatureUpdateState (SCreature* creature);
 
 /* обработка физики и движения */
 void CreatureAddImpulse (SCreature* creature, float x, float y);
@@ -80,3 +81,10 @@ void CreatureGetSdlRect (SCreature* creature, SDL_Rect* rect);
 SDL_Texture* CreatureGetTexture (SCreature* creature, int numFrame);
 /* AI */
 void CreatureUpdateAI (SCreature* creature);
+
+/*static bool IsPlaceFree (float x, float y,
+                         bool checkAll,
+                         SLevelObject** obstacleLevelObject,
+                         SCreature** obstacleCreature);*/
+
+void CreaturesUpdate();

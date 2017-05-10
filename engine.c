@@ -20,7 +20,7 @@ bool EngineStart()
     deltaTime = 0.0f;
     fps = 0;
 
-    if (SDL_Init (SDL_INIT_EVERYTHING) != 0)
+    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0)
     {
         printf ("SDL_Init Error: %s\n", SDL_GetError());
         return false;
@@ -61,13 +61,24 @@ bool EngineCreateRenderer (int index, unsigned long flags)
     return (sdlRenderer != NULL);
 }
 
+bool EngineInitAudio()
+{
+    return (Mix_OpenAudio (44100, MIX_DEFAULT_FORMAT, 2, 2048) >= 0);
+}
+
+SDL_Texture* EngineLoadTexture (const char* fileName)
+{
+    return IMG_LoadTexture(sdlRenderer, fileName);
+}
+
+
 void EngineRenderClear()
 {
     SDL_RenderClear(sdlRenderer);
 }
 
 
-void EngineRenderLevel()
+void EngineUpdateAndRenderLevel()
 {
     int r, c;
     SDL_Rect rect;
@@ -85,8 +96,32 @@ void EngineRenderLevel()
 
             if (levelObject != NULL)
             {
-                rect.x = c * BLOCK_SIZE;
-                rect.y = r * BLOCK_SIZE;
+                /* update levelObject position... */
+                //if (!levelObject->isStatic)
+                {
+                    levelObject->center.x = levelObject->pos.x + (BLOCK_SIZE >> 1);
+                    levelObject->center.y = levelObject->pos.y + (BLOCK_SIZE >> 1);
+
+                    float distY = levelObject->pos.y - levelObject->startPos.y;
+                    if (abs (distY) > EPSILON)
+                    //if (levelObject->pos.y != levelObject->startPos.y)
+                    {
+                        if (levelObject->pos.y < levelObject->startPos.y)
+                            levelObject->pos.y += deltaTime*BLOCK_SIZE;
+
+                        if (levelObject->pos.y > levelObject->startPos.y)
+                            levelObject->pos.y -= deltaTime*BLOCK_SIZE;
+                    }
+                    else
+                        if (distY != 0.0f)
+                            levelObject->pos.y = levelObject->startPos.y;
+                }
+
+
+                /*rect.x = c * BLOCK_SIZE;
+                rect.y = r * BLOCK_SIZE;*/
+                rect.x = (int)(levelObject->pos.x);
+                rect.y = (int)(levelObject->pos.y);
 
                 SDL_RenderCopy (sdlRenderer, levelTextures [levelObject->texIndex], NULL, &rect);
             }
@@ -127,9 +162,4 @@ void EngineUpdateTime()
         fps = fpsCounter;
         fpsCounter = 0;
     }
-}
-
-SDL_Texture* EngineLoadTexture (const char* fileName)
-{
-    return IMG_LoadTexture(sdlRenderer, fileName);
 }

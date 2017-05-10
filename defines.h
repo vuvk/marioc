@@ -1,10 +1,5 @@
 #pragma once
 
-/* booleans */
-#define bool unsigned char
-#define false 0
-#define true 1
-
 /* main window size */
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
@@ -18,10 +13,8 @@
 #define ERR_SDL_NOT_INITIALIZED 1
 #define ERR_SDL_WINDOW_NOT_CREATED 2
 #define ERR_SDL_RENDERER_NOT_CREATED 3
+#define ERR_SDL_AUDIO_NOT_INITIALIZED 4
 
-/* globals */
-float deltaTime;
-int fps;
 #define LIMIT_FPS 1.0/30.0
 
 #define SQR(X) (X)*(X)
@@ -37,4 +30,16 @@ int fps;
 /* game logics*/
 #define BLOCK_SIZE 32
 #define MAX_CREATURES_COUNT 64
+#define MAX_PHYSOBJECTS_COUNT 128
 
+/* booleans */
+#define false 0
+#define true 1
+typedef unsigned char bool;
+
+/* byte */
+typedef unsigned char byte;
+
+/* globals */
+float deltaTime;
+int fps;

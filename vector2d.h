@@ -1,5 +1,8 @@
 #pragma once
 
+#include "defines.h"
+
+
 typedef struct
 {
     int x;
@@ -11,6 +14,7 @@ typedef struct
     float x;
     float y;
 } SVector2f;
+
 
 /* операции с векторами */
 /* сложение/вычитание векторов */

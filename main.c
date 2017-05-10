@@ -9,8 +9,11 @@
 #include "additions.h"
 #include "engine.h"
 #include "texture.h"
+#include "sound.h"
 #include "vector2d.h"
 #include "creature.h"
+#include "corpse.h"
+#include "physObj.h"
 #include "player.h"
 
 SDL_Rect backgroundRect;
@@ -32,14 +35,20 @@ int Initialize ()
                                  WINDOW_WIDTH, WINDOW_HEIGHT,
                                  SDL_WINDOW_SHOWN))
         {
-            printf ("I can't create SDL window :(");
+            printf ("I can't create SDL window :(\n");
             return ERR_SDL_WINDOW_NOT_CREATED;
         }
 
         if (!EngineCreateRenderer (-1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC))
         {
-            printf ("I can't create SDL renderer :(");
+            printf ("I can't create SDL renderer :(\n");
             return ERR_SDL_RENDERER_NOT_CREATED;
+        }
+
+        if (!EngineInitAudio())
+        {
+            printf ("I can't initialize audio :(\n");
+            return ERR_SDL_AUDIO_NOT_INITIALIZED;
         }
 
         return ERR_NONE;
@@ -48,66 +57,45 @@ int Initialize ()
     {
         return ERR_SDL_NOT_INITIALIZED;
     }
-
-}
-
-void LoadTexture (SDL_Texture** texture, const char* fileName)
-{
-    if (FileExists (fileName))
-        *texture = EngineLoadTexture (fileName);
-    else
-        printf ("File '%s' doesn't exists!\n", fileName);
 }
 
 void LoadResources()
 {
-    int i;
-    char buffer[30];
+    LoadTextures();
 
-    /* TEXTURES for PLAYER */
-    for (i = 0; i < 6; i++)
-    {
-        sprintf (buffer, "./media/player%i.png", i);
-        LoadTexture (&playerTextures[i], buffer);
-    }
-
-    /* TEXTURES for GOOMBA */
-    for (i = 0; i < 2; i++)
-    {
-        sprintf (buffer, "./media/goomba%i.png", i);
-        LoadTexture (&goombaTextures[i], buffer);
-    }
-
-    /* TEXTURES for LEVEL OBJECTS */
-    /* background */
-    LoadTexture (&levelTextures[0], "./media/background.png");
-    /* blocks */
-    LoadTexture (&levelTextures[1], "./media/block.png");
+    LoadSounds();
 }
 
 void Render ()
 {
     SDL_Rect rect;
     SCreature* creature;
+    SCorpse* corpse;
 
     EngineRenderClear();
 
     /* draw level */
     EngineRenderImage (levelTextures[0], &backgroundRect, false);
-    EngineRenderLevel();
+    EngineUpdateAndRenderLevel();
 
 
-    /* draw all creatures */
-    int i;
-    for (i = 0; i < MAX_CREATURES_COUNT; i++)
+    /* draw all creatures and corpses */
+    register unsigned short i;
+    for (i = 0; i < creaturesCount; i++)
     {
         creature = creatures[i];
+        corpse = corpses[i];
 
         if (creature != NULL)
         {
             CreatureGetSdlRect (creature, &rect);
-
             EngineRenderImage (CreatureGetTexture (creature, creature->curFrame), &rect, (creature->xDir < 0));
+        }
+
+        if (corpse != NULL)
+        {
+            CorpseGetSdlRect (corpse, &rect);
+            EngineRenderImage (CorpseGetTexture(corpse), &rect, false);
         }
     }
 
@@ -122,24 +110,12 @@ void Update ()
     /* update ticks and deltaTime */
     EngineUpdateTime();
 
-    int i;
-    SCreature* creature;
+    PhysObjectsUpdate();
+    CreaturesUpdate();
+    CorpsesUpdate ();
 
-    PlayerUpdateFrames (player);
-    for (i = 0; i < MAX_CREATURES_COUNT; i++)
-    {
-        creature = creatures[i];
-
-        if (creature != NULL)
-        {
-            CreatureUpdateMove (creature);
-            CreatureUpdatePhysics (creature);
-            CreatureUpdateAnimation (creature);
-
-            if (creature != player)
-                CreatureUpdateAI (creature);
-        }
-    }
+    PlayerUpdate (player);
+    PlayerUpdateFrames(player);
 }
 
 int main (int argc, char *argv[])
@@ -175,7 +151,8 @@ int main (int argc, char *argv[])
                     case SDLK_d :
                     case SDLK_RIGHT :
                     {
-                        player->xDir = 1;
+                        if (player != NULL)
+                            player->xDir =  1;
                         moveR = true;
                         moveL = false;
                         break;
@@ -183,7 +160,8 @@ int main (int argc, char *argv[])
                     case SDLK_a :
                     case SDLK_LEFT :
                     {
-                        player->xDir = -1;
+                        if (player != NULL)
+                            player->xDir = -1;
                         moveR = false;
                         moveL = true;
                         break;
@@ -192,8 +170,11 @@ int main (int argc, char *argv[])
                     case SDLK_LCTRL :
                     case SDLK_RCTRL :
                     {
-                        player->moveSpeed = 7.5f;
-                        player->accelSpeed = 30.0f;
+                        if (player != NULL)
+                        {
+                            player->moveSpeed = 7.5f;
+                            player->accelSpeed = 30.0f;
+                        }
                         break;
                     }
 
@@ -201,19 +182,63 @@ int main (int argc, char *argv[])
                     case SDLK_w :
                     case SDLK_SPACE :
                     {
-                        if (player->isGrounded)
+                        if (player != NULL)
                         {
-                            player->pos.y -= 1.0f;
-                            CreatureAddImpulse (player, 0.0f, -6.5f);
+                            SPhysObject* physBody = physObjects[player->physBodyIndex];
+                            if (physBody != NULL && physBody->isGrounded)
+                            {
+                                if (IsPlaceFree (physBody->pos.x,               physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL) &&
+                                    IsPlaceFree (physBody->center.x,            physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL) &&
+                                    IsPlaceFree (physBody->pos.x + physBody->w, physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL))
+                                {
+                                    physBody->pos.y -= 1.0f;
+                                    CreatureAddImpulse (player, 0.0f, -6.5f);
+
+                                    Mix_PlayChannel (-1, sndJump, 0);
+                                }
+                            }
+
+                        }
+                        break;
+                    }
+
+                    case SDLK_DOWN :
+                    case SDLK_s :
+                    {
+                        if (player != NULL)
+                        {
+                            SPhysObject* physBody = physObjects[player->physBodyIndex];
+                            if (physBody != NULL)
+                            {
+                                physBody->w = BLOCK_SIZE;
+                                physBody->h = BLOCK_SIZE;
+                                physBody->pos.y += BLOCK_SIZE;
+                            }
+
                         }
                         break;
                     }
 
                     case SDLK_r :
                     {
+                        StopAllSounds();
                         LevelLoad();
                         break;
                     }
+
+
+                    case SDLK_q :
+                    {
+                        int i, count = 0;
+                        for (i = 0; i < MAX_CREATURES_COUNT; i++)
+                        {
+                            if (corpses[i] != NULL)
+                                count ++;
+                        }
+                        printf("corpses - %d\n", count);
+                        break;
+                    }
+
 
                     case SDLK_ESCAPE :
                     {
@@ -241,11 +266,31 @@ int main (int argc, char *argv[])
                         break;
                     }
 
+                    case SDLK_DOWN :
+                    case SDLK_s :
+                    {
+                        if (player != NULL)
+                        {
+                            SPhysObject* physBody = physObjects[player->physBodyIndex];
+                            if (physBody != NULL)
+                            {
+                                physBody->w = BLOCK_SIZE * 1.5;
+                                physBody->h = BLOCK_SIZE << 1;
+                                //physBody->pos.y -= BLOCK_SIZE;
+                            }
+
+                        }
+                        break;
+                    }
+
                     case SDLK_LCTRL :
                     case SDLK_RCTRL :
                     {
-                        player->moveSpeed = 5.0f;
-                        player->accelSpeed = 20.0f;
+                        if (player != NULL)
+                        {
+                            player->moveSpeed = 5.0f;
+                            player->accelSpeed = 20.0f;
+                        }
                         break;
                     }
                 }
@@ -253,19 +298,42 @@ int main (int argc, char *argv[])
         }
 
         /* player movement */
-        if (!moveL && !moveR)
+        if (player != NULL)
         {
-            //player->impulse.x = 0.0f;
-        }
-        else
-        {
-            if (abs (player->impulse.x) < EPSILON)
-                CreatureAddImpulse (player, player->xDir, 0.0f);
+            if (!moveL && !moveR)
+            {
+                /* player->impulse.x = 0.0f; */
+            }
+            else
+            {
+                SPhysObject* physBody = physObjects[player->physBodyIndex];
+                if (physBody != NULL)
+                {
+                    /* куда должен сместиться игрок */
+                    float dx = (player->accelSpeed)*deltaTime;
 
-            if (moveL)
-                CreatureAddImpulse (player, -(player->accelSpeed)*deltaTime, 0.0f);
-            if (moveR)
-                CreatureAddImpulse (player,  (player->accelSpeed)*deltaTime, 0.0f);
+                    /* проверяем, можно ли двигаться */
+                    if (moveL)
+                    if (IsPlaceFree (physBody->pos.x - dx, physBody->center.y, false, NULL, NULL))
+                    {
+                        /* просто первоначальный толчок, чтобы перебороть трение (костыль какой-то...) */
+                        if (abs (physBody->impulse.x) < EPSILON)
+                            CreatureAddImpulse (player, player->xDir, 0.0f);
+
+                        CreatureAddImpulse (player, -dx, 0.0f);
+                    }
+
+                    if (moveR)
+                    if (IsPlaceFree (physBody->pos.x + physBody->w + dx, physBody->center.y, false, NULL, NULL))
+                    {
+                        /* просто первоначальный толчок, чтобы перебороть трение (костыль какой-то...) */
+                        if (abs (physBody->impulse.x) < EPSILON)
+                            CreatureAddImpulse (player, player->xDir, 0.0f);
+
+                        CreatureAddImpulse (player, dx, 0.0f);
+                    }
+                }
+            }
         }
 
         Render();
@@ -277,11 +345,12 @@ int main (int argc, char *argv[])
     }
 
     CreatureClearAll();
+    CorpseClearAll();
+    PhysObjectClearAll();
     LevelClear();
 
     EngineStop();
     printf ("\nGoodbye, my love...\n");
-    //getch();
 
     return ERR_NONE;
 }

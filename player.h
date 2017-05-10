@@ -13,7 +13,8 @@ bool moveR;
     bool moveR;
 } SPlayer;*/
 
+
+/* update player state */
+void PlayerUpdate (SCreature* player);
 /* apply frames for events*/
 void PlayerUpdateFrames (SCreature* player);
-
-void PlayerGetDamage (SCreature* player, int damage);

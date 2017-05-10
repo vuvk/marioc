@@ -4,38 +4,37 @@
 #include "defines.h"
 #include "vector2d.h"
 #include "texture.h"
+#include "sound.h"
 #include "creature.h"
+#include "corpse.h"
 #include "player.h"
 
+
 SCreature* CreatureCreate (ECreatureType creatureType,
-                           int health,
+                           short health,
                            float x, float y,
-                           int w, int h,
+                           byte w, int h,
                            float moveSpeed,
                            SDL_Texture** textures,
-                           int texCount,
+                           unsigned short texCount,
                            float animSpeed)
 {
     SCreature* creature = (SCreature*) malloc(sizeof(SCreature));
 
     creature->creatureType = creatureType;
     creature->health = health;
-    creature->pos.x = x;
-    creature->pos.y = y;
-    creature->w = w;
-    creature->h = h;
-    creature->halfW = w / 2;
-    creature->halfH = h / 2;
-    creature->center.x = x + creature->halfW;
-    creature->center.y = y + creature->halfH;
-    creature->impulse.x = 0.0f;
-    creature->impulse.y = 0.0f;
+
+    /* search place for body in physObjects array */
+    register unsigned short i = 0;
+    while ((physObjects[i] != NULL) && (i < MAX_PHYSOBJECTS_COUNT))
+        i++;
+    physObjects[i] = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_ALL);
+    creature->physBodyIndex = i;
 
     creature->xDir = 0;
 
     creature->moveSpeed = moveSpeed;
     creature->accelSpeed = 20.0f;
-    creature->friction = 5.0f;
 
     creature->textures = textures;
     creature->texCount = texCount;
@@ -46,27 +45,59 @@ SCreature* CreatureCreate (ECreatureType creatureType,
     creature->endFrame = texCount - 1;
     creature->curFrame = 0;
 
+
     return creature;
 }
 
-void CreatureDestroy (SCreature* creature)
+void CreatureDestroy (SCreature** creature)
 {
-    if (creature == NULL)
+    if (creature == NULL || *creature == NULL)
         return;
 
-    free (creature);
-    creature = NULL;
+    PhysObjectDestroy (&(physObjects[(*creature)->physBodyIndex]));
+
+    free (*creature);
+    *creature = NULL;
 }
 
 void CreatureClearAll ()
 {
-    int i;
+    register unsigned short int i;
     for (i = 0; i < MAX_CREATURES_COUNT; i++)
     {
-        CreatureDestroy (creatures[i]);
+        CreatureDestroy (&(creatures[i]));
     }
 
     creaturesCount = 0;
+}
+
+void CreatureGetDamage (SCreature* creature, int damage)
+{
+    if (creature == NULL)
+        return;
+
+    creature->health -= damage;
+}
+
+void CreatureUpdateState (SCreature* creature)
+{
+    if (creature == NULL)
+        return;
+
+    /* самовыпилиться, если за границей уровня */
+    SPhysObject* physBody = physObjects[creature->physBodyIndex];
+    short xPos = (short)((physBody->center.x) / BLOCK_SIZE);
+    short yPos = (short)((physBody->center.y) / BLOCK_SIZE);
+    if (xPos < 0 || xPos >= LEVEL_WIDTH ||
+        yPos < 0 || yPos >= LEVEL_HEIGHT)
+    {
+        CreatureGetDamage (creature, 100);
+        return;
+    }
+
+    /* ограничение скорости движения физического тела */
+    if (abs(physBody->impulse.x) > creature->moveSpeed)
+        physBody->impulse.x = (creature->moveSpeed)*(creature->xDir);
 }
 
 void CreatureAddImpulse (SCreature* creature, float x, float y)
@@ -74,8 +105,7 @@ void CreatureAddImpulse (SCreature* creature, float x, float y)
     if (creature == NULL)
         return;
 
-    creature->impulse.x += x;
-    creature->impulse.y += y;
+    PhysObjectAddImpulse (physObjects[creature->physBodyIndex], x, y);
 }
 
 bool CreatureContainsPoint (SCreature* creature, float x, float y)
@@ -83,8 +113,7 @@ bool CreatureContainsPoint (SCreature* creature, float x, float y)
     if (creature == NULL)
         return false;
 
-    return ((x >= creature->pos.x) && (x <= creature->pos.x + creature->w) &&
-            (y >= creature->pos.y) && (y <= creature->pos.y + creature->h));
+    return PhysObjectContainsPoint(physObjects[creature->physBodyIndex], x, y);
 }
 
 bool CreatureIsCollisionCreature (SCreature* c1, SCreature* c2)
@@ -92,21 +121,7 @@ bool CreatureIsCollisionCreature (SCreature* c1, SCreature* c2)
     if (c1 == NULL || c2 == NULL)
         return false;
 
-    /* минимальное возможное расстояние между центрами */
-    float distX = c1->halfW + c2->halfW;
-    float distY = c1->halfH + c2->halfH;
-
-    /* есть столкновение по X или Y */
-    bool isCollX = false;
-    bool isCollY = false;
-
-    /* если расстояние между центрами меньше возможного, то столкновение точно есть */
-    if (abs(c1->center.x - c2->center.x) < distX)
-        isCollX = true;
-    if (abs(c1->center.y - c2->center.y) < distY)
-        isCollY = true;
-
-    return (isCollX && isCollY);
+    return (PhysObjectIsCollisionPhysObject(physObjects[c1->physBodyIndex], physObjects[c2->physBodyIndex]));
 }
 
 bool CreatureIsCollisionLevelObject (SCreature* c1, SLevelObject* l2)
@@ -114,78 +129,23 @@ bool CreatureIsCollisionLevelObject (SCreature* c1, SLevelObject* l2)
     if (c1 == NULL || l2 == NULL)
         return false;
 
-    /* минимальное возможное расстояние между центрами */
-    float distX = c1->halfW + BLOCK_SIZE / 2;
-    float distY = c1->halfH + BLOCK_SIZE / 2;
-
-    /* есть столкновение по X или Y */
-    bool isCollX = false;
-    bool isCollY = false;
-
-    /* если расстояние между центрами меньше возможного, то столкновение точно есть */
-    if (abs (c1->center.x - l2->center.x) < distX)
-        isCollX = true;
-    if (abs (c1->center.y - l2->center.y) < distY)
-        isCollY = true;
-
-    return (isCollX && isCollY);
+    return (PhysObjectIsCollisionLevelObject(physObjects[c1->physBodyIndex], l2));
 }
 
-
-void CreatureUpdateMove (SCreature* creature)
-{
-    if (creature == NULL)
-        return;
-
-    creature->center.x = creature->pos.x + creature->halfW;
-    creature->center.y = creature->pos.y + creature->halfH;
-
-    /* самовыпилиться, если за границей уровня */
-    int xPos = ((int)creature->center.x) / BLOCK_SIZE;
-    int yPos = ((int)creature->center.y) / BLOCK_SIZE;
-    if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-        yPos < 0 || yPos >= LEVEL_HEIGHT)
-    {
-        CreatureDestroy (creature);
-        return;
-    }
-
-    /* meet creature under self */
-    /*int i;
-    for (i = 0; i < MAX_CREATURES_COUNT; i++)
-    {
-        SCreature* testCreature = creatures[i];
-        if ((testCreature != NULL) && (creature != testCreature))
-        {
-            if (CreatureIsCollisionCreature (creature, testCreature))
-            {
-                //* jump
-                if ((creature->center.y < testCreature->center.y) &&
-                    (creature->impulse.y >= EPSILON))
-                {
-                    creature->pos.y -= 1.0f;
-
-                    CreatureAddImpulse (creature, 0.0f, -3.5f);
-                }
-            }
-        }
-    }*/
-}
-
-
-bool IsPlaceFree (float x, float y,
-                  bool checkAll,
-                  SLevelObject** obstacleLevelObject, SCreature** obstacleCreature)
+static bool IsPlaceFreeForCreature (float x, float y,
+                                    bool checkAll,
+                                    SLevelObject** obstacleLevelObject,
+                                    SCreature** obstacleCreature)
 {
     /* check elements of level */
-    int xPos = (int)x / BLOCK_SIZE;
-    int yPos = (int)y / BLOCK_SIZE;
+    short xPos = (short)x / BLOCK_SIZE;
+    short yPos = (short)y / BLOCK_SIZE;
     if (xPos < 0 || xPos >= LEVEL_WIDTH ||
         yPos < 0 || yPos >= LEVEL_HEIGHT)
         return false;
 
     SLevelObject* levelObject = level[yPos][xPos];
-    if ((levelObject != NULL) && (levelObject->solid))
+    if ((levelObject != NULL) && (levelObject->isSolid))
     {
         *obstacleLevelObject = levelObject;
         return false;
@@ -195,12 +155,16 @@ bool IsPlaceFree (float x, float y,
     if (checkAll)
     {
         SCreature* creature;
-        int i;
+        register unsigned short int i;
         for (i = 0; i < MAX_CREATURES_COUNT; i++)
         {
             creature = creatures[i];
             if (creature != NULL)
             {
+                SPhysObject* physBody = physObjects [creature->physBodyIndex];
+                if (physBody == NULL || physBody->collisionFlag < PHYSOBJ_COLLISION_WITH_ALL)
+                    return true;
+
                 if (CreatureContainsPoint(creature, x, y))
                 {
                     *obstacleCreature = creature;
@@ -219,63 +183,74 @@ void CreatureUpdatePhysics (SCreature* creature)
     if (creature == NULL)
         return;
 
-    int xPos, yPos;
-    //SVector2f oldPos = creature->pos;
-    SLevelObject* levelObject;
-
-
-    /* limits */
-    if (creature->impulse.x < MIN_HORIZONTAL_IMPULSE)
-        creature->impulse.x = MIN_HORIZONTAL_IMPULSE;
-    if (creature->impulse.x > MAX_HORIZONTAL_IMPULSE)
-        creature->impulse.x = MAX_HORIZONTAL_IMPULSE;
-    if (creature->impulse.y < MIN_VERTICAL_IMPULSE)
-        creature->impulse.y = MIN_VERTICAL_IMPULSE;
-    if (creature->impulse.y > MAX_VERTICAL_IMPULSE)
-        creature->impulse.y = MAX_VERTICAL_IMPULSE;
-
-    /* previously checking */
-    SLevelObject* obstacleLevelObject = NULL;
-    SCreature* obstacleCreature = NULL;
-    //void* obstacle;
+    SPhysObject* physBody = physObjects[creature->physBodyIndex];
+    SLevelObject* obstacleLevelObject;
+    SCreature* obstacleCreature;
     SVector2f testPosition;
+    short xPos;
+    short yPos;
+
     /* если преграда перед существом (крайняя точка существа + impulse.x), то туда нельзя идти... */
-    testPosition.x = creature->center.x + (creature->halfW)*(creature->xDir) + creature->impulse.x;
-    testPosition.y = creature->center.y;
-    if (!IsPlaceFree (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
-    //if (!IsPlaceFree (testPosition.x, testPosition.y, true, &obstacle))
+    //testPosition.x = physBody->center.x + (physBody->halfW)*(creature->xDir) + (physBody->impulse.x * 2.0f);
+    //testPosition.x = physBody->center.x + (physBody->w)*(creature->xDir);
+    if (physBody->impulse.x < EPSILON)
+        testPosition.x = physBody->pos.x - 8.0f;
+    else
+        testPosition.x = physBody->pos.x + physBody->w + 8.0f;
+    testPosition.y = physBody->center.y;
+    /* level edges check  */
+    xPos = (short)testPosition.x / BLOCK_SIZE;
+    yPos = (short)testPosition.y / BLOCK_SIZE;
+    if (xPos < 0 || xPos > LEVEL_WIDTH ||
+        yPos < 0 || yPos > LEVEL_HEIGHT)
     {
-        //if (creature != obstacle)
+        CreatureGetDamage (creature, 100);
+        return;
+    }
+
+    obstacleLevelObject = NULL;
+    obstacleCreature = NULL;
+    if (!IsPlaceFreeForCreature (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
+    {
+        if (creature != obstacleCreature)
         {
-            /* you are enemy? */
             if (creature != player)
             {
-                /* kick player's ass!! */
                 if (obstacleCreature == player)
-                {
-                    PlayerGetDamage (player, 1);
-                }
+                    CreatureGetDamage (player, 1);
 
-                /* change direction... */
-                if ((obstacleCreature != player) || (obstacleLevelObject != NULL))
-                {
-                    creature->impulse.x = 0.0f;
-                    creature->xDir *= -1;
-                }
+                physBody->impulse.x = 0.0f;
+                creature->xDir *= -1;
+            }
+            else
+            {
+                if (obstacleCreature != NULL)
+                    CreatureGetDamage (player, 1);
             }
         }
     }
     /* если преграда под или над существом, то движение невозможно */
-    testPosition.x = creature->center.x;
-    testPosition.y = creature->center.y + creature->impulse.y;
-    if (creature->impulse.y < EPSILON)
-        testPosition.y -= creature->halfH;
+    testPosition.x = physBody->center.x;
+    //testPosition.y = physBody->center.y;
+    if (physBody->impulse.y < EPSILON)
+        testPosition.y = physBody->pos.y - 8.0f;
     else
-        testPosition.y += creature->halfH;
-    if (!IsPlaceFree (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
-    //if (!IsPlaceFree (testPosition.x, testPosition.y, true, &obstacle))
+        testPosition.y = physBody->pos.y + physBody->h + 8.0f;
+    /* level edges check  */
+    xPos = (short)testPosition.x / BLOCK_SIZE;
+    yPos = (short)testPosition.y / BLOCK_SIZE;
+    if (xPos < 0 || xPos >= LEVEL_WIDTH ||
+        yPos < 0 || yPos >= LEVEL_HEIGHT)
     {
-        creature->impulse.y = 0.0f;
+        CreatureGetDamage (creature, 100);
+        return;
+    }
+
+    obstacleLevelObject = NULL;
+    obstacleCreature = NULL;
+    if (!IsPlaceFreeForCreature (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
+    {
+        //physBody->impulse.y = 0.0f;
 
         /* obstacle is block */
         if (obstacleLevelObject != NULL)
@@ -289,187 +264,27 @@ void CreatureUpdatePhysics (SCreature* creature)
             if (creature != obstacleCreature)
             {
                 /* you are enemy? */
-                if (creature != player)
+                /*if (creature != player)
                 {
-                    /* kick player's ass!! */
+                    /* kick player's ass!!
                     if (obstacleCreature == player)
-                        PlayerGetDamage (player, 1);
-                }
+                        CreatureGetDamage (player, 1);
+                        //printf ("Kick player's ass!\n");
+                }*/
 
                 /* jump, if obstacle is creature under you */
-                if (obstacleCreature->center.y > creature->center.y)
+                if (physObjects[obstacleCreature->physBodyIndex]->center.y >= (physBody->pos.y + physBody->h))
                 {
                     //creature->pos.y -= 1.0f;
+                    physBody->impulse.y = 0.0f;
                     CreatureAddImpulse (creature, 0.0f, -3.5f);
+
+                    /* kick enemie's ass! */
+                    CreatureGetDamage (obstacleCreature, 1);
+
+                    Mix_PlayChannel (-1, sndKick, 0);
                 }
             }
-        }
-    }
-
-
-    /*****************/
-    /* VERTICAL MOVE */
-    /*****************/
-
-    /* check gravity */
-    creature->isGrounded = false;
-
-    /* apply gravity */
-    float gravity = creature->impulse.y;
-    if (gravity <= GRAVITY)
-        gravity += GRAVITY*deltaTime;
-    else
-        gravity = GRAVITY;
-
-    xPos = ((int)creature->center.x) / BLOCK_SIZE;
-    yPos = ((int)(creature->pos.y + creature->h)) / BLOCK_SIZE;
-
-    levelObject = level [yPos][xPos];
-    if (levelObject != NULL)
-    {
-        if (levelObject->solid)
-        {
-            creature->isGrounded = true;
-        }
-    }
-
-    if (creature->isGrounded)
-    {
-        gravity = 0.0f;
-    }
-
-    creature->impulse.y = gravity;
-
-
-    /*******************/
-    /* HORIZONTAL MOVE */
-    /*******************/
-
-    /* ограничение по максимальной скорости */
-    if (abs (creature->impulse.x) > creature->moveSpeed)
-        creature->impulse.x = (creature->moveSpeed)*(creature->xDir);
-
-    /* friction */
-    if (abs (creature->impulse.x) > EPSILON)
-    {
-        if (creature->impulse.x > EPSILON)
-            creature->impulse.x -= (creature->friction)*deltaTime;
-
-        if (creature->impulse.x < EPSILON)
-            creature->impulse.x += (creature->friction)*deltaTime;
-    }
-    else
-    {
-        creature->impulse.x = 0.0f;
-    }
-
-    /* check horizontal position */
-    xPos = ((int)creature->center.x + creature->impulse.x) / BLOCK_SIZE;
-    yPos = ((int)creature->center.y) / BLOCK_SIZE;
-
-    levelObject = level [yPos][xPos];
-    if (levelObject != NULL)
-    {
-        if (levelObject->solid)
-        {
-            creature->impulse.x = 0.0f;
-        }
-    }
-
-    /* apply impulse */
-    creature->pos = AddVector2f (creature->pos, creature->impulse);
-
-
-
-    /*******************/
-    /* CHECK COLLISION */
-    /*******************/
-
-    xPos = ((int)creature->center.x) / BLOCK_SIZE;
-    yPos = ((int)creature->center.y) / BLOCK_SIZE;
-    //SVector2f offset;
-
-    /* проверим не застрял ли по горизонтали */
-    if (xPos > 0)
-    {
-        levelObject = level [yPos][xPos - 1];
-        if ((levelObject != NULL) && (levelObject->solid))
-        {
-            /* слева */
-            if (creature->pos.x < (levelObject->pos.x + BLOCK_SIZE))
-            {
-                float offsetX = (levelObject->pos.x + BLOCK_SIZE) - creature->pos.x;
-                creature->pos.x += offsetX;
-                creature->impulse.x = 0.0f;
-            }
-        }
-    }
-    if (xPos < LEVEL_WIDTH - 1)
-    {
-        levelObject = level [yPos][xPos + 1];
-        if ((levelObject != NULL) && (levelObject->solid))
-        {
-            /* справа */
-            if ((creature->pos.x + creature->w) > levelObject->pos.x)
-            {
-                float offsetX = (creature->pos.x + creature->w) - levelObject->pos.x;
-                creature->pos.x -= offsetX;
-                creature->impulse.x = 0.0f;
-            }
-        }
-    }
-    /* проверим не застрял ли по вертикали */
-    if (yPos > 0)
-    {
-        levelObject = level [yPos - 1][xPos];
-        if ((levelObject != NULL) && (levelObject->solid))
-        {
-            /* сверху */
-            if (creature->pos.y < (levelObject->pos.y + BLOCK_SIZE))
-            {
-                float offsetY = (levelObject->pos.y + BLOCK_SIZE) - creature->pos.y;
-                creature->pos.y += offsetY;
-
-                /* также impulse выставить в 0, чтобы создание начало падать */
-                if (creature->impulse.y < EPSILON)
-                    creature->impulse.y = 0.0f;
-            }
-        }
-    }
-    if (yPos < LEVEL_HEIGHT - 1)
-    {
-        levelObject = level [yPos + 1][xPos];
-        if ((levelObject != NULL) && (levelObject->solid))
-        {
-            /* снизу */
-            if (levelObject->pos.y < (creature->pos.y + creature->h))
-            {
-                float offsetY = (creature->pos.y + creature->h) - levelObject->pos.y;
-                creature->pos.y -= offsetY;
-            }
-        }
-    }
-
-    /* застрял прямо здесь и сейчас?! */
-    levelObject = level [yPos][xPos];
-    if ((levelObject != NULL) && (levelObject->solid))
-    {
-        float offsetX = levelObject->center.x - creature->center.x;
-        float offsetY = levelObject->center.y - creature->center.y;
-
-        if (abs (offsetX) > abs (offsetY))
-        {
-            if (creature->center.x < levelObject->center.x)
-                creature->pos.x = levelObject->pos.x - creature->w;
-            else
-                creature->pos.x = levelObject->pos.x + BLOCK_SIZE;
-        }
-        else
-        {
-            if (creature->center.y < levelObject->center.y)
-                creature->pos.y = levelObject->pos.y - creature->h;
-            else
-                creature->pos.y = levelObject->pos.y + BLOCK_SIZE;
         }
     }
 }
@@ -487,46 +302,8 @@ void CreatureUpdateAI (SCreature* creature)
             creature->xDir = -1;
     }
 
-    /* change direction if place in level not free */
-    /*int xPos = ((int)creature->center.x) / BLOCK_SIZE;
-    int yPos = ((int)creature->center.y) / BLOCK_SIZE;
-
-    SLevelObject* levelObject = level [yPos][xPos + creature->xDir];
-    if (levelObject != NULL && levelObject->solid)
-    {
-        creature->impulse.x = 0.0f;
-        creature->xDir = -creature->xDir;
-    }*/
-
-    /* meet creature */
-    /*int i;
-    for (i = 0; i < MAX_CREATURES_COUNT; i++)
-    {
-        SCreature* testCreature = creatures[i];
-        if ((testCreature != NULL) && (creature != testCreature))
-        {
-            if (CreatureIsCollisionCreature (creature, testCreature))
-            {
-                //* change direction /
-                creature->impulse.x = 0.0f;
-                creature->xDir = -creature->xDir;
-
-                if (creature->center.x < testCreature->center.x)
-                {
-                    creature->pos.x = testCreature->pos.x - creature->w;
-                    testCreature->pos.x = creature->pos.x + creature->w;
-                }
-                else
-                {
-                    creature->pos.x = testCreature->pos.x + creature->w;
-                    testCreature->pos.x = creature->pos.x - testCreature->w;
-                }
-            }
-        }
-    }*/
-
     /* move... */
-    if (abs (creature->impulse.x) < EPSILON)
+    if (abs (physObjects[creature->physBodyIndex]->impulse.x) < EPSILON)
         CreatureAddImpulse (creature, creature->xDir, 0.0f);
     CreatureAddImpulse (creature, (creature->accelSpeed)*(creature->xDir)*deltaTime, 0.0f);
 }
@@ -577,12 +354,12 @@ void CreatureUpdateAnimation (SCreature* creature)
 
 void CreatureGetSdlRect (SCreature* creature, SDL_Rect* rect)
 {
-    if (creature != NULL)
+    if (creature != NULL && rect != NULL)
     {
-        rect->x = (int)(creature->pos.x);
-        rect->y = (int)(creature->pos.y);
-        rect->w = (int)(creature->w);
-        rect->h = (int)(creature->h);
+        rect->x = (int)(physObjects[creature->physBodyIndex]->pos.x);
+        rect->y = (int)(physObjects[creature->physBodyIndex]->pos.y);
+        rect->w = physObjects[creature->physBodyIndex]->w;
+        rect->h = physObjects[creature->physBodyIndex]->h;
     }
 }
 
@@ -591,4 +368,81 @@ SDL_Texture* CreatureGetTexture (SCreature* creature, int numFrame)
     SDL_Texture** p = (SDL_Texture**) creature->textures;
     p += numFrame;
     return *p;
+}
+
+void CreaturesUpdate()
+{
+    register unsigned short int i;
+    SCreature* creature = NULL;
+    for (i = 0; i < MAX_CREATURES_COUNT; i++)
+    {
+        creature = creatures[i];
+
+        if (creature != NULL)
+        {
+            CreatureUpdateState (creature);
+
+            if (creature->health <= 0)
+            {
+                SPhysObject* physBody = physObjects[creature->physBodyIndex];
+                if (physBody != NULL)
+                {
+                    SCorpse* corpse = CorpseCreate(physBody->pos.x, physBody->pos.y,
+                                                   physBody->w,     physBody->h,
+                                                   3.0f,
+                                                   NULL);
+
+                    switch (creature->creatureType)
+                    {
+                        case ctPlayer :
+                        {
+                            corpse->texture = &(playerTextures[6]);
+
+                            physBody = physObjects[corpse->physBodyIndex];
+                            physBody->collisionFlag = PHYSOBJ_NO_COLLISION;
+                            physBody->impulse.x = 0.0f;
+                            physBody->impulse.y = 0.0f;
+                            physBody->pos.y -= 3.0f;
+                            PhysObjectAddImpulse(physBody, 0.0f, -5.0f);
+
+                            Mix_PlayChannel (-1, sndMarioDie, 0);
+
+                            break;
+                        }
+
+                        case ctGoomba :
+                        {
+                            corpse->texture = &(goombaTextures[2]);
+
+                            physBody = physObjects[corpse->physBodyIndex];
+                            physBody->collisionFlag = PHYSOBJ_COLLISION_WITH_LEVEL;
+                            physBody->impulse.x = 0.0f;
+                            physBody->impulse.y = 0.0f;
+
+                            break;
+                        }
+
+                        default :
+                        {
+                            break;
+                        }
+                    }
+
+                    corpses[i] = corpse;
+                }
+
+                if (creature == player)
+                    player = NULL;
+
+                CreatureDestroy (&(creatures[i]));
+                continue;
+            }
+
+            CreatureUpdatePhysics (creature);
+            CreatureUpdateAnimation (creature);
+
+            if (creature != player)
+                CreatureUpdateAI (creature);
+        }
+    }
 }
