@@ -20,6 +20,9 @@ SDL_Texture* playerTextures[7];
 /* textures of enemies */
 SDL_Texture* goombaTextures[3];
 
+/* misc textures */
+SDL_Texture* miscTextures[10];
+
 
 
 

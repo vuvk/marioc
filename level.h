@@ -13,7 +13,8 @@ typedef enum
     lotMetalBrick,
     lotBlock,
     lotCoinBox,
-    lotMushroomBox
+    lotMushroomBox,
+    lotSurpriseBlockUsed
 } ELevelObjectType;
 
 /* объект уровня */
@@ -46,7 +47,8 @@ void LevelObjectDestroy (SLevelObject** levelObject);
 void LevelLoad ();
 void LevelClear ();
 
-/*void LevelObjectsUpdate ();*/
+void LevelUpdateAndRender ();
+
 
 /* check place */
 /*bool IsPlaceFree (float x, float y, bool checkAll, void** obstacle);

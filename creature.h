@@ -5,6 +5,7 @@
 #include "level.h"
 #include "physObj.h"
 
+
 typedef enum
 {
     ctPlayer,
@@ -54,7 +55,7 @@ unsigned short creaturesCount;
 SCreature* CreatureCreate (ECreatureType creatureType,
                            short health,
                            float x, float y,
-                           byte w, int h,
+                           ubyte w, ubyte h,
                            float moveSpeed,
                            SDL_Texture** textures,
                            unsigned short texCount,

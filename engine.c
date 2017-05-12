@@ -4,12 +4,11 @@
 #include "texture.h"
 #include "level.h"
 
-
 /* время в начале и в конце кадра */
 unsigned long int startTick, endTick;
 /* счетчик кадров и FPS */
-int fpsCounter = 0;
-float timeDelay = 0.0f;
+unsigned short int fpsCounter;
+float delayTime = 0.0f;
 
 SDL_Window* sdlWindow;
 SDL_Renderer* sdlRenderer;
@@ -17,8 +16,8 @@ SDL_Renderer* sdlRenderer;
 bool EngineStart()
 {
     startTick = endTick = SDL_GetPerformanceCounter();
-    deltaTime = 0.0f;
-    fps = 0;
+    deltaTime = delayTime = 0.0f;
+    fps = fpsCounter = 0;
 
     if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0)
     {
@@ -57,7 +56,7 @@ bool EngineCreateRenderer (int index, unsigned long flags)
     if (sdlWindow == NULL)
         return false;
 
-    sdlRenderer = SDL_CreateRenderer(sdlWindow, index, flags);
+    sdlRenderer = SDL_CreateRenderer (sdlWindow, index, flags);
     return (sdlRenderer != NULL);
 }
 
@@ -78,7 +77,7 @@ void EngineRenderClear()
 }
 
 
-void EngineUpdateAndRenderLevel()
+/*void EngineUpdateAndRenderLevel()
 {
     int r, c;
     SDL_Rect rect;
@@ -96,30 +95,23 @@ void EngineUpdateAndRenderLevel()
 
             if (levelObject != NULL)
             {
-                /* update levelObject position... */
-                //if (!levelObject->isStatic)
+                // update levelObject position...
+                levelObject->center.x = levelObject->pos.x + (BLOCK_SIZE >> 1);
+                levelObject->center.y = levelObject->pos.y + (BLOCK_SIZE >> 1);
+
+                float distY = levelObject->pos.y - levelObject->startPos.y;
+                if (abs (distY) > EPSILON)
                 {
-                    levelObject->center.x = levelObject->pos.x + (BLOCK_SIZE >> 1);
-                    levelObject->center.y = levelObject->pos.y + (BLOCK_SIZE >> 1);
+                    if (levelObject->pos.y < levelObject->startPos.y)
+                        levelObject->pos.y += deltaTime*BLOCK_SIZE;
 
-                    float distY = levelObject->pos.y - levelObject->startPos.y;
-                    if (abs (distY) > EPSILON)
-                    //if (levelObject->pos.y != levelObject->startPos.y)
-                    {
-                        if (levelObject->pos.y < levelObject->startPos.y)
-                            levelObject->pos.y += deltaTime*BLOCK_SIZE;
-
-                        if (levelObject->pos.y > levelObject->startPos.y)
-                            levelObject->pos.y -= deltaTime*BLOCK_SIZE;
-                    }
-                    else
-                        if (distY != 0.0f)
-                            levelObject->pos.y = levelObject->startPos.y;
+                    if (levelObject->pos.y > levelObject->startPos.y)
+                        levelObject->pos.y -= deltaTime*BLOCK_SIZE;
                 }
+                else
+                    if (distY != 0.0f)
+                        levelObject->pos.y = levelObject->startPos.y;
 
-
-                /*rect.x = c * BLOCK_SIZE;
-                rect.y = r * BLOCK_SIZE;*/
                 rect.x = (int)(levelObject->pos.x);
                 rect.y = (int)(levelObject->pos.y);
 
@@ -127,9 +119,9 @@ void EngineUpdateAndRenderLevel()
             }
         }
     }
-}
+}*/
 
-void EngineRenderImage(SDL_Texture* texture, SDL_Rect* rect, bool flipX)
+void EngineRenderImage (SDL_Texture* texture, const SDL_Rect* rect, bool flipX)
 {
     if (!flipX)
     {
@@ -143,6 +135,18 @@ void EngineRenderImage(SDL_Texture* texture, SDL_Rect* rect, bool flipX)
     }
 }
 
+void EngineRenderImageEx (SDL_Texture* texture, const SDL_Rect* rect,
+                          const double angle,
+                          const SVector2f* center,
+                          const SDL_RendererFlip flip)
+{
+    SDL_Point point;
+    point.x = (int)(center->x);
+    point.y = (int)(center->y);
+
+    SDL_RenderCopyEx (sdlRenderer, texture, NULL, rect, angle, &point, flip);
+}
+
 void EngineRenderPresent()
 {
     SDL_RenderPresent(sdlRenderer);
@@ -150,15 +154,18 @@ void EngineRenderPresent()
 
 void EngineUpdateTime()
 {
-    startTick = SDL_GetPerformanceCounter();
-    deltaTime = (float)(startTick - endTick) / SDL_GetPerformanceFrequency();
+    while (deltaTime < LIMIT_FPS)
+    {
+        startTick = SDL_GetPerformanceCounter();
+        deltaTime = (float)(startTick - endTick) / SDL_GetPerformanceFrequency();
+    }
     endTick = startTick;
 
     fpsCounter++;
-    timeDelay += deltaTime;
-    if (timeDelay >= 1.0f)
+    delayTime += deltaTime;
+    if (delayTime >= 1.0f)
     {
-        timeDelay -= 1.0f;
+        delayTime -= 1.0f;
         fps = fpsCounter;
         fpsCounter = 0;
     }

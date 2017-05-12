@@ -6,19 +6,21 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Release">
+			<Target title="Release_Win">
 				<Option output="bin/mario" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-O3" />
+					<Add option="-march=i386" />
+					<Add option="-O5 -pipe" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
 				</Linker>
 			</Target>
-			<Target title="Debug">
+			<Target title="Debug_Win">
 				<Option output="bin/mario" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/" />
 				<Option type="1" />
@@ -27,15 +29,47 @@
 					<Add option="-Wall" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
+				</Linker>
+			</Target>
+			<Target title="Release_Lin">
+				<Option output="bin/mario" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-march=native -O5 -pipe" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
+				</Linker>
+			</Target>
+			<Target title="Debug_Lin">
+				<Option output="bin/mario" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add directory="./inc" />
 		</Compiler>
 		<Linker>
-			<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
 			<Add directory="./lib" />
 		</Linker>
+		<Unit filename="additions.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="additions.h" />
 		<Unit filename="corpse.c">
 			<Option compilerVar="CC" />
@@ -54,6 +88,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="level.h" />
+		<Unit filename="lump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lump.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

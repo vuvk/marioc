@@ -3,7 +3,7 @@
 #include <time.h>
 /*#include <conio.h>*/
 
-/*#include "SDL2/SDL.h"*/
+#include "SDL2/SDL.h"
 
 #include "defines.h"
 #include "additions.h"
@@ -13,6 +13,7 @@
 #include "vector2d.h"
 #include "creature.h"
 #include "corpse.h"
+#include "lump.h"
 #include "physObj.h"
 #include "player.h"
 
@@ -21,10 +22,15 @@ SDL_Rect backgroundRect;
 SDL_Event sdlEvent;
 bool isGameActive = true;
 
+/* не выше LIMIT_FPS */
+/*float limitFps;*/
+
 int Initialize ()
 {
     /* set seed for randomizer */
     srand (time (0));
+
+    /*limitFps = 0.0f;*/
 
     if (EngineStart())
     {
@@ -76,26 +82,26 @@ void Render ()
 
     /* draw level */
     EngineRenderImage (levelTextures[0], &backgroundRect, false);
-    EngineUpdateAndRenderLevel();
-
+    LevelUpdateAndRender ();
+    LumpsUpdateAndRender();
 
     /* draw all creatures and corpses */
     register unsigned short i;
-    for (i = 0; i < creaturesCount; i++)
+    for (i = 0; i < MAX_CREATURES_COUNT; i++)
     {
         creature = creatures[i];
         corpse = corpses[i];
-
-        if (creature != NULL)
-        {
-            CreatureGetSdlRect (creature, &rect);
-            EngineRenderImage (CreatureGetTexture (creature, creature->curFrame), &rect, (creature->xDir < 0));
-        }
 
         if (corpse != NULL)
         {
             CorpseGetSdlRect (corpse, &rect);
             EngineRenderImage (CorpseGetTexture(corpse), &rect, false);
+        }
+
+        if (creature != NULL)
+        {
+            CreatureGetSdlRect (creature, &rect);
+            EngineRenderImage (CreatureGetTexture (creature, creature->curFrame), &rect, (creature->xDir < 0));
         }
     }
 
@@ -110,12 +116,12 @@ void Update ()
     /* update ticks and deltaTime */
     EngineUpdateTime();
 
-    PhysObjectsUpdate();
-    CreaturesUpdate();
-    CorpsesUpdate ();
-
     PlayerUpdate (player);
     PlayerUpdateFrames(player);
+
+    CreaturesUpdate();
+    CorpsesUpdate ();
+    PhysObjectsUpdate();
 }
 
 int main (int argc, char *argv[])
@@ -187,9 +193,45 @@ int main (int argc, char *argv[])
                             SPhysObject* physBody = physObjects[player->physBodyIndex];
                             if (physBody != NULL && physBody->isGrounded)
                             {
-                                if (IsPlaceFree (physBody->pos.x,               physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL) &&
+                                bool canJump = true;
+                                SLevelObject* levelObject;
+                                short xPos, yPos;
+                                yPos = (short)(physBody->pos.y - 1.0f) / BLOCK_SIZE;
+
+                                /* проверяем позицию левого края над головой */
+                                xPos = (short)(physBody->pos.x) / BLOCK_SIZE;
+                                levelObject = level[yPos][xPos];
+                                if (levelObject != NULL &&
+                                    levelObject->isSolid &&
+                                    levelObject->isStatic)
+                                    canJump = false;
+
+                                /* если всё ещё можешь прыгать, то проверим позицию в центре над головой */
+                                if (canJump)
+                                {
+                                    xPos = (short)(physBody->center.x) / BLOCK_SIZE;
+                                    levelObject = level[yPos][xPos];
+                                    if (levelObject != NULL &&
+                                        levelObject->isSolid &&
+                                        levelObject->isStatic)
+                                    canJump = false;
+                                }
+
+                                /* осталась последняя проверка в правом углу... */
+                                if (canJump)
+                                {
+                                    xPos = (short)(physBody->pos.x + physBody->w) / BLOCK_SIZE;
+                                    levelObject = level[yPos][xPos];
+                                    if (levelObject != NULL &&
+                                        levelObject->isSolid &&
+                                        levelObject->isStatic)
+                                    canJump = false;
+                                }
+
+                                /*if (IsPlaceFree (physBody->pos.x,               physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL) &&
                                     IsPlaceFree (physBody->center.x,            physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL) &&
-                                    IsPlaceFree (physBody->pos.x + physBody->w, physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL))
+                                    IsPlaceFree (physBody->pos.x + physBody->w, physBody->center.y - physBody->halfH - 1.0f, false, NULL, NULL))*/
+                                if (canJump)
                                 {
                                     physBody->pos.y -= 1.0f;
                                     CreatureAddImpulse (player, 0.0f, -6.5f);
@@ -208,13 +250,13 @@ int main (int argc, char *argv[])
                         if (player != NULL)
                         {
                             SPhysObject* physBody = physObjects[player->physBodyIndex];
-                            if (physBody != NULL)
+                            if ((physBody != NULL) && (player->health == 2))
                             {
-                                physBody->w = BLOCK_SIZE;
-                                physBody->h = BLOCK_SIZE;
+                                /*physBody->h = BLOCK_SIZE;*/
                                 physBody->pos.y += BLOCK_SIZE;
-                            }
 
+                                player->health = 1;
+                            }
                         }
                         break;
                     }
@@ -272,11 +314,12 @@ int main (int argc, char *argv[])
                         if (player != NULL)
                         {
                             SPhysObject* physBody = physObjects[player->physBodyIndex];
-                            if (physBody != NULL)
+                            if ((physBody != NULL) && (player->health == 1))
                             {
-                                physBody->w = BLOCK_SIZE * 1.5;
-                                physBody->h = BLOCK_SIZE << 1;
-                                //physBody->pos.y -= BLOCK_SIZE;
+                                /*physBody->h = BLOCK_SIZE << 1;*/
+                                physBody->pos.y -= BLOCK_SIZE;
+
+                                player->health = 2;
                             }
 
                         }
@@ -336,7 +379,16 @@ int main (int argc, char *argv[])
             }
         }
 
+        /*limitFps += deltaTime;
+        if (limitFps >= LIMIT_FPS)
+        {
+            limitFps -= LIMIT_FPS;
+            Update ();
+            Render ();
+        }*/
+
         Render();
+        deltaTime = 0.0f;
 
         /* show fps */
         char buffer[25];
@@ -346,6 +398,7 @@ int main (int argc, char *argv[])
 
     CreatureClearAll();
     CorpseClearAll();
+    LumpClearAll();
     PhysObjectClearAll();
     LevelClear();
 

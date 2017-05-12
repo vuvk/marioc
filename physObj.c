@@ -1,8 +1,8 @@
-#include "physObj.h"
 #include "defines.h"
-#include "level.h"
+#include "additions.h"
+#include "physObj.h"
 
-SPhysObject* PhysObjectCreate (float x, float y, byte w, byte h, byte collisionFlag)
+SPhysObject* PhysObjectCreate (float x, float y, ubyte w, ubyte h, ubyte collisionFlag)
 {
     SPhysObject* physObject = (SPhysObject*) malloc (sizeof(SPhysObject));
     physObject->pos.x = x;
@@ -158,13 +158,11 @@ void PhysObjectUpdatePhysics (SPhysObject* physObject)
                         if (xOffset > yOffset)
                         {
                             /* блок справа */
-                            //if (physObject->impulse.x > EPSILON)
                             if (physObject->center.x < levelObject->center.x)
                             if (yOffset <= halfH + (physObject->halfH >> 1))
                                 physObject->pos.x = levelObject->pos.x - physObject->w;
 
                             /* блок слева */
-                            //if (physObject->impulse.x < -EPSILON)
                             if (physObject->center.x > levelObject->center.x)
                             if (yOffset <= halfH + (physObject->halfH >> 1))
                                 physObject->pos.x = levelObject->pos.x + BLOCK_SIZE;
@@ -175,7 +173,6 @@ void PhysObjectUpdatePhysics (SPhysObject* physObject)
                         else
                         {
                             /* блок сверху */
-                            //if (physObject->impulse.y < -EPSILON)
                             if (physObject->center.y > levelObject->center.y)
                             if (xOffset <= halfW + (physObject->halfW >> 1))
                             {
@@ -184,7 +181,6 @@ void PhysObjectUpdatePhysics (SPhysObject* physObject)
                             }
 
                             /* блок снизу */
-                            //if (physObject->impulse.y > EPSILON)
                             if (physObject->center.y < levelObject->center.y)
                             if (xOffset <= halfW + (physObject->halfW >> 1))
                             {

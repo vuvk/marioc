@@ -1,6 +1,8 @@
+#include "engine.h"
 #include "level.h"
 #include "texture.h"
 #include "corpse.h"
+#include "lump.h"
 #include "player.h"
 
 /* временный массив уровня */
@@ -14,10 +16,10 @@ char levelData [LEVEL_HEIGHT][LEVEL_WIDTH] =
     "#          g   g   #",
     "#   p              #",
     "#        #         #",
-    "#                  #",
+    "#     b            #",
     "#        b     #   #",
     "#              #   #",
-    "#          bbb     #",
+    "# c        bbb     #",
     "#     b##b         #",
     "#            #     #",
     "##############   ###"
@@ -70,8 +72,9 @@ void LevelLoad ()
     register unsigned short r, c;
 
     CreatureClearAll();
-    PhysObjectClearAll();
     CorpseClearAll();
+    LumpClearAll();
+    PhysObjectClearAll();
     LevelClear();
     char symbol;
 
@@ -137,6 +140,13 @@ void LevelLoad ()
                     break;
                 }
 
+                /* surprise block */
+                case 'c' :
+                {
+                    level [r][c] = LevelObjectCreate (lotCoinBox, c * BLOCK_SIZE, r * BLOCK_SIZE, true, false, 3);
+                    break;
+                }
+
                 default :
                 {
                     if (level [r][c] != NULL)
@@ -152,3 +162,47 @@ void LevelLoad ()
     }
 }
 
+void LevelUpdateAndRender ()
+{
+    int r, c;
+    SDL_Rect rect;
+    SLevelObject* levelObject;
+    rect.x = 0;
+    rect.y = 0;
+    rect.w = BLOCK_SIZE;
+    rect.h = BLOCK_SIZE;
+
+    for (r = 0; r < LEVEL_HEIGHT; r ++)
+    {
+        for (c = 0; c < LEVEL_WIDTH; c ++)
+        {
+            levelObject = level[r][c];
+
+            if (levelObject != NULL)
+            {
+                // update levelObject position...
+                levelObject->center.x = levelObject->pos.x + (BLOCK_SIZE >> 1);
+                levelObject->center.y = levelObject->pos.y + (BLOCK_SIZE >> 1);
+
+                float distY = levelObject->pos.y - levelObject->startPos.y;
+                if (abs (distY) > EPSILON)
+                {
+                    if (levelObject->pos.y < levelObject->startPos.y)
+                        levelObject->pos.y += deltaTime*BLOCK_SIZE;
+
+                    if (levelObject->pos.y > levelObject->startPos.y)
+                        levelObject->pos.y -= deltaTime*BLOCK_SIZE;
+                }
+                else
+                    if (distY != 0.0f)
+                        levelObject->pos.y = levelObject->startPos.y;
+
+                rect.x = (int)(levelObject->pos.x);
+                rect.y = (int)(levelObject->pos.y);
+
+                //SDL_RenderCopy (sdlRenderer, levelTextures [levelObject->texIndex], NULL, &rect);
+                EngineRenderImage (levelTextures [levelObject->texIndex], &rect, false);
+            }
+        }
+    }
+}

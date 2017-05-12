@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include "defines.h"
 #include "level.h"
-
 
 #define PHYSOBJ_NO_COLLISION 0
 #define PHYSOBJ_COLLISION_WITH_LEVEL 1
@@ -20,14 +18,14 @@ typedef struct
     SVector2f pos;
     SVector2f center;
     /* размеры */
-    byte w, h;
-    byte halfW, halfH;
+    ubyte w, h;
+    ubyte halfW, halfH;
 
     /* движение */
     SVector2f impulse;
 
     /* с чем может сталкиваться */
-    byte collisionFlag;
+    ubyte collisionFlag;
 
     float friction;
     bool isGrounded;
@@ -37,7 +35,7 @@ typedef struct
 SPhysObject* physObjects[MAX_PHYSOBJECTS_COUNT];
 
 
-SPhysObject* PhysObjectCreate (float x, float y, byte w, byte h, byte collisionFlag);
+SPhysObject* PhysObjectCreate (float x, float y, ubyte w, ubyte h, ubyte collisionFlag);
 void PhysObjectDestroy (SPhysObject** physObject);
 void PhysObjectClearAll ();
 

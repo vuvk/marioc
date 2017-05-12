@@ -2,18 +2,19 @@
 #include <stdio.h>
 
 #include "defines.h"
+#include "additions.h"
 #include "vector2d.h"
 #include "texture.h"
 #include "sound.h"
 #include "creature.h"
 #include "corpse.h"
+#include "lump.h"
 #include "player.h"
-
 
 SCreature* CreatureCreate (ECreatureType creatureType,
                            short health,
                            float x, float y,
-                           byte w, int h,
+                           ubyte w, ubyte h,
                            float moveSpeed,
                            SDL_Texture** textures,
                            unsigned short texCount,
@@ -54,7 +55,9 @@ void CreatureDestroy (SCreature** creature)
     if (creature == NULL || *creature == NULL)
         return;
 
-    PhysObjectDestroy (&(physObjects[(*creature)->physBodyIndex]));
+    SPhysObject* physBody = physObjects[(*creature)->physBodyIndex];
+    if (physBody != NULL)
+        PhysObjectDestroy (&(physObjects[(*creature)->physBodyIndex]));
 
     free (*creature);
     *creature = NULL;
@@ -189,103 +192,111 @@ void CreatureUpdatePhysics (SCreature* creature)
     SVector2f testPosition;
     short xPos;
     short yPos;
+    register ubyte i;
+    bool isCollided;     /* было ли уже взаимодействие */
 
     /* если преграда перед существом (крайняя точка существа + impulse.x), то туда нельзя идти... */
-    //testPosition.x = physBody->center.x + (physBody->halfW)*(creature->xDir) + (physBody->impulse.x * 2.0f);
-    //testPosition.x = physBody->center.x + (physBody->w)*(creature->xDir);
-    if (physBody->impulse.x < EPSILON)
-        testPosition.x = physBody->pos.x - 8.0f;
-    else
-        testPosition.x = physBody->pos.x + physBody->w + 8.0f;
-    testPosition.y = physBody->center.y;
-    /* level edges check  */
-    xPos = (short)testPosition.x / BLOCK_SIZE;
-    yPos = (short)testPosition.y / BLOCK_SIZE;
-    if (xPos < 0 || xPos > LEVEL_WIDTH ||
-        yPos < 0 || yPos > LEVEL_HEIGHT)
-    {
-        CreatureGetDamage (creature, 100);
-        return;
-    }
-
-    obstacleLevelObject = NULL;
-    obstacleCreature = NULL;
-    if (!IsPlaceFreeForCreature (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
-    {
-        if (creature != obstacleCreature)
-        {
-            if (creature != player)
-            {
-                if (obstacleCreature == player)
-                    CreatureGetDamage (player, 1);
-
-                physBody->impulse.x = 0.0f;
-                creature->xDir *= -1;
-            }
-            else
-            {
-                if (obstacleCreature != NULL)
-                    CreatureGetDamage (player, 1);
-            }
-        }
-    }
-    /* если преграда под или над существом, то движение невозможно */
+    /* проверяем три точки: у головы, у центра, у ног по Y до первого взаимодействия */
+    isCollided = false;
     testPosition.x = physBody->center.x;
-    //testPosition.y = physBody->center.y;
-    if (physBody->impulse.y < EPSILON)
-        testPosition.y = physBody->pos.y - 8.0f;
-    else
-        testPosition.y = physBody->pos.y + physBody->h + 8.0f;
-    /* level edges check  */
-    xPos = (short)testPosition.x / BLOCK_SIZE;
-    yPos = (short)testPosition.y / BLOCK_SIZE;
-    if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-        yPos < 0 || yPos >= LEVEL_HEIGHT)
-    {
-        CreatureGetDamage (creature, 100);
-        return;
-    }
+    testPosition.y = physBody->pos.y + 1.0f;
+    if (physBody->impulse.x < -EPSILON)
+        testPosition.x = physBody->pos.x - 8.0f;
+    if (physBody->impulse.x >  EPSILON)
+        testPosition.x = physBody->pos.x + physBody->w + 8.0f;
 
-    obstacleLevelObject = NULL;
-    obstacleCreature = NULL;
-    if (!IsPlaceFreeForCreature (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
+    for (i = 0; ((i < 3) && (!isCollided)); i++)
     {
-        //physBody->impulse.y = 0.0f;
-
-        /* obstacle is block */
-        if (obstacleLevelObject != NULL)
+        /* level edges check  */
+        xPos = (short)testPosition.x / BLOCK_SIZE;
+        yPos = (short)testPosition.y / BLOCK_SIZE;
+        if (xPos < 0 || xPos > LEVEL_WIDTH ||
+            yPos < 0 || yPos > LEVEL_HEIGHT)
         {
-            //creature->impulse.y = 0.0f;
+            CreatureGetDamage (creature, 100);
+            return;
         }
 
-        /* obstacle is creature */
-        if (obstacleCreature != NULL)
+        obstacleLevelObject = NULL;
+        obstacleCreature = NULL;
+        if (!IsPlaceFreeForCreature (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
         {
             if (creature != obstacleCreature)
             {
-                /* you are enemy? */
-                /*if (creature != player)
+                if (creature != player)
                 {
-                    /* kick player's ass!!
                     if (obstacleCreature == player)
                         CreatureGetDamage (player, 1);
-                        //printf ("Kick player's ass!\n");
-                }*/
 
-                /* jump, if obstacle is creature under you */
-                if (physObjects[obstacleCreature->physBodyIndex]->center.y >= (physBody->pos.y + physBody->h))
-                {
-                    //creature->pos.y -= 1.0f;
-                    physBody->impulse.y = 0.0f;
-                    CreatureAddImpulse (creature, 0.0f, -3.5f);
-
-                    /* kick enemie's ass! */
-                    CreatureGetDamage (obstacleCreature, 1);
-
-                    Mix_PlayChannel (-1, sndKick, 0);
+                    //physBody->impulse.x *= -1;
+                    physBody->impulse.x = 0.0f;
+                    creature->xDir *= -1;
                 }
+                else
+                {
+                    if (obstacleCreature != NULL)
+                        CreatureGetDamage (player, 1);
+
+                }
+
+                isCollided = true;
             }
         }
+
+        testPosition.y += physBody->halfH - 1;
+    }
+
+
+    /* если преграда под или над существом, то движение невозможно */
+    /* проверяем три точки: у крайней левой точки, у центра, у правого края по X до первого взаимодействия */
+    isCollided = false;
+    testPosition.x = physBody->pos.x + 1.0f;
+    testPosition.y = physBody->center.y;
+    if (physBody->impulse.y < -EPSILON)
+        testPosition.y = physBody->pos.y - 8.0f;
+    if (physBody->impulse.y >  EPSILON)
+        testPosition.y = physBody->pos.y + physBody->h + 8.0f;
+
+    for (i = 0; ((i < 3) && (!isCollided)); i++)
+    {
+        /* level edges check  */
+        xPos = (short)testPosition.x / BLOCK_SIZE;
+        yPos = (short)testPosition.y / BLOCK_SIZE;
+        if (xPos < 0 || xPos >= LEVEL_WIDTH ||
+            yPos < 0 || yPos >= LEVEL_HEIGHT)
+        {
+            CreatureGetDamage (creature, 100);
+            return;
+        }
+
+        obstacleLevelObject = NULL;
+        obstacleCreature = NULL;
+        if (!IsPlaceFreeForCreature (testPosition.x, testPosition.y, true, &obstacleLevelObject, &obstacleCreature))
+        {
+            /* obstacle is creature */
+            if (obstacleCreature != NULL)
+            {
+                if (creature != obstacleCreature)
+                {
+                    /* jump, if obstacle is creature under you */
+                    if (physObjects[obstacleCreature->physBodyIndex]->center.y >= (physBody->pos.y + physBody->h))
+                    {
+                        //creature->pos.y -= 1.0f;
+                        physBody->impulse.y = 0.0f;
+                        CreatureAddImpulse (creature, 0.0f, -3.5f);
+
+                        /* kick enemie's ass! */
+                        CreatureGetDamage (obstacleCreature, 1);
+
+                        Mix_PlayChannel (-1, sndKick, 0);
+                    }
+                }
+
+                isCollided = true;
+            }
+        }
+
+        testPosition.x += physBody->halfW - 1;
     }
 }
 
@@ -324,7 +335,7 @@ void CreatureUpdateAnimation (SCreature* creature)
 
     /* всяческие проверки диапазона анимации */
     if (creature->startFrame > creature->endFrame)
-        Swapi (&(creature->startFrame), &(creature->endFrame));
+        Swaps (&(creature->startFrame), &(creature->endFrame));
 
     if (creature->startFrame < 0)
         creature->startFrame = 0;
@@ -387,6 +398,15 @@ void CreaturesUpdate()
                 SPhysObject* physBody = physObjects[creature->physBodyIndex];
                 if (physBody != NULL)
                 {
+                    /* create blood! */
+                    LumpCreateSeveral (physBody->center.x, physBody->center.y,
+                                       8, 4,
+                                       5.0f,
+                                       true,
+                                       &(miscTextures[1]),
+                                       10);
+
+                    /* now create corpse*/
                     SCorpse* corpse = CorpseCreate(physBody->pos.x, physBody->pos.y,
                                                    physBody->w,     physBody->h,
                                                    3.0f,
@@ -428,7 +448,11 @@ void CreaturesUpdate()
                         }
                     }
 
-                    corpses[i] = corpse;
+                    /*corpses[i] = corpse;*/
+                    register unsigned short int j = 0;
+                    while (corpses[j] != NULL && j < MAX_CREATURES_COUNT)
+                        j++;
+                    corpses[j] = corpse;
                 }
 
                 if (creature == player)

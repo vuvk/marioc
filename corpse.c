@@ -34,7 +34,9 @@ void CorpseDestroy (SCorpse** corpse)
     if (corpse == NULL || *corpse == NULL)
         return;
 
-    PhysObjectDestroy (&(physObjects[(*corpse)->physBodyIndex]));
+    SPhysObject* physBody = physObjects[(*corpse)->physBodyIndex];
+    if (physBody != NULL)
+        PhysObjectDestroy (&(physObjects[(*corpse)->physBodyIndex]));
 
     free (*corpse);
     *corpse = NULL;
@@ -42,7 +44,6 @@ void CorpseDestroy (SCorpse** corpse)
 
 void CorpseClearAll ()
 {
-    SCorpse* corpse;
     register unsigned short int i;
 
     for (i = 0; i < MAX_CREATURES_COUNT; i++)
@@ -102,21 +103,16 @@ void CorpsesUpdate ()
             }
 
             /* check edges of level */
-            /*short xPos = (short)(corpse->pos.x + (corpse->w >> 1)) / BLOCK_SIZE;
-            short yPos = (short)(corpse->pos.y + (corpse->h >> 1)) / BLOCK_SIZE;
+            SPhysObject* corpseBody = physObjects[corpse->physBodyIndex];
+            short xPos = (short)(corpseBody->pos.x + (corpseBody->w >> 1)) / BLOCK_SIZE;
+            short yPos = (short)(corpseBody->pos.y + (corpseBody->h >> 1)) / BLOCK_SIZE;
 
             if (xPos < 0 || xPos >= LEVEL_WIDTH ||
                 yPos < 0 || yPos >= LEVEL_HEIGHT)
             {
                 CorpseDestroy (&(corpses[i]));
                 continue;
-            }*/
-
-            /* fall */
-            /*yPos = (short)(corpse->pos.y + corpse->h) / BLOCK_SIZE;
-            SLevelObject* levelObject = level[yPos][xPos];
-            if (levelObject == NULL || !levelObject->solid)
-                corpse->pos.y += BLOCK_SIZE*deltaTime;*/
+            }
         }
     }
 }

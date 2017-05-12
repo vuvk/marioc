@@ -5,7 +5,7 @@
 Mix_Chunk* sndJump;
 Mix_Chunk* sndMarioDie;
 Mix_Chunk* sndKick;
-
+Mix_Chunk* sndBreakBlock;
 
 void LoadSounds();
 void FreeSounds();

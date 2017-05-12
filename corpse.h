@@ -3,7 +3,7 @@
 #include "SDL2/SDL.h"
 
 #include "defines.h"
-#include "vector2d.h"
+//#include "vector2d.h"
 #include "physObj.h"
 
 

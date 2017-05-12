@@ -1,3 +1,6 @@
+#include <stdio.h>
+
+#include "additions.h"
 #include "texture.h"
 
 
@@ -35,4 +38,10 @@ void LoadTextures()
     /* blocks */
     LoadTexture (&levelTextures[1], "./media/tex/block.png");
     LoadTexture (&levelTextures[2], "./media/tex/red_brick.png");
+    LoadTexture (&levelTextures[3], "./media/tex/bonus_block0.png");
+    LoadTexture (&levelTextures[4], "./media/tex/bonus_block3.png");
+
+    /* misc */
+    LoadTexture (&miscTextures[0], "./media/tex/brick.png");
+    LoadTexture (&miscTextures[1], "./media/tex/blood.png");
 }

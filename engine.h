@@ -7,9 +7,8 @@
 #include "SDL2/SDL_image.h"
 
 #include "defines.h"
+#include "vector2d.h"
 
-extern float deltaTime;
-extern int fps;
 
 bool EngineStart();
 void EngineStop();
@@ -22,8 +21,13 @@ SDL_Texture* EngineLoadTexture (const char* fileName);
 
 
 void EngineRenderClear();
-void EngineUpdateAndRenderLevel();
-void EngineRenderImage (SDL_Texture* texture, SDL_Rect* rect, bool flipX);
+//void EngineUpdateAndRenderLevel();
+void EngineRenderImage (SDL_Texture* texture, const SDL_Rect* rect, bool flipX);
+void EngineRenderImageEx (SDL_Texture* texture, const SDL_Rect* rect,
+                          const double angle,
+                          const SVector2f* center,
+                          const SDL_RendererFlip flip);
+
 void EngineRenderPresent();
 void EngineUpdateTime();
 
