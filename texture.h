@@ -2,6 +2,7 @@
 
 #include "SDL2/SDL.h"
 
+#include "defines.h"
 #include "engine.h"
 
 typedef struct
@@ -12,20 +13,27 @@ typedef struct
 
 
 /* textures of level */
-SDL_Texture* levelTextures[10];
+//SDL_Texture* levelTextures[228];
+SDL_Texture* levelTextures;
 
 /* textures of player */
-SDL_Texture* playerTextures[7];
+SDL_Texture* playerTextures[13];
 
 /* textures of enemies */
 SDL_Texture* goombaTextures[3];
 
+/* textures of surprises */
+SDL_Texture* surpriseTextures[2];
+
 /* misc textures */
-SDL_Texture* miscTextures[10];
+SDL_Texture* miscTextures[2];
 
 
 
 
-void LoadTexture (SDL_Texture** texture, const char* fileName);
-
+void TextureLoad (SDL_Texture** texture, const char* fileName);
 void LoadTextures();
+
+#define TextureSetColor (texture, r, g, b) TextureArraySetColor (texture, r, g, b, 1)
+/* можно указать массив для установки цвета всем элементам */
+void TextureArraySetColor (SDL_Texture** textures, const ubyte r, const ubyte g, const ubyte b, uint16 count);

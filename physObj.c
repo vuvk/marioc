@@ -7,6 +7,8 @@ SPhysObject* PhysObjectCreate (float x, float y, ubyte w, ubyte h, ubyte collisi
     SPhysObject* physObject = (SPhysObject*) malloc (sizeof(SPhysObject));
     physObject->pos.x = x;
     physObject->pos.y = y;
+    physObject->impulse.x = 0.0f;
+    physObject->impulse.y = 0.0f;
     physObject->w = w;
     physObject->h = h;
     physObject->halfW = w >> 1;
@@ -15,7 +17,7 @@ SPhysObject* PhysObjectCreate (float x, float y, ubyte w, ubyte h, ubyte collisi
     physObject->center.y = y + physObject->halfH;
     physObject->collisionFlag = collisionFlag;
     physObject->isGrounded = false;
-    physObject->friction = 5.0f;
+    physObject->friction = BLOCK_SIZE / 6.0f;
 
     return physObject;
 }
@@ -31,8 +33,7 @@ void PhysObjectDestroy (SPhysObject** physObject)
 
 void PhysObjectClearAll ()
 {
-    register unsigned short i;
-    for (i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
+    for (uint16 i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
     {
         if (physObjects[i] != NULL)
             PhysObjectDestroy(&(physObjects[i]));
@@ -138,8 +139,7 @@ void PhysObjectUpdatePhysics (SPhysObject* physObject)
         float minDistX = physObject->halfW + halfW;
         float minDistY = physObject->halfH + halfH;
 
-        register unsigned short i;
-        register unsigned short j;
+        uint16 i, j;
         for (j = yStart; j <= yEnd; j++)
             for (i = xStart; i <= xEnd; i++)
             {
@@ -301,8 +301,7 @@ bool IsPlaceFree (float x, float y,
     if (checkAll)
     {
         SPhysObject* physObject;
-        register unsigned short int i;
-        for (i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
+        for (uint16 i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
         {
             physObject = physObjects[i];
             if (physObject != NULL)
@@ -370,9 +369,8 @@ bool PhysObjectIsCollisionLevelObject (SPhysObject* o1, SLevelObject* l2)
 
 void PhysObjectsUpdate()
 {
-    register unsigned short i;
     SPhysObject* physObject;
-    for (i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
+    for (uint16 i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
     {
         physObject = physObjects[i];
 
@@ -384,10 +382,11 @@ void PhysObjectsUpdate()
             /* check edges of level */
             short xPos = (short)physObject->center.x / BLOCK_SIZE;
             short yPos = (short)physObject->center.y / BLOCK_SIZE;
-            if (xPos < 0 || xPos > LEVEL_WIDTH ||
-                yPos < 0 || yPos > LEVEL_HEIGHT)
+            if (xPos < 0 || xPos >= LEVEL_WIDTH ||
+                yPos < 0 || yPos >= LEVEL_HEIGHT)
             {
                 PhysObjectDestroy (&(physObjects[i]));
+                continue;
             }
         }
     }

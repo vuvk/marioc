@@ -12,12 +12,12 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-march=i386" />
-					<Add option="-O5 -pipe" />
+					<Add option="-O3" />
+					<Add option="-pipe" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -llibxml2 -liconv" />
 				</Linker>
 			</Target>
 			<Target title="Debug_Win">
@@ -27,10 +27,12 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
+					<Add option="-m32" />
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -llibxml2 -liconv" />
 				</Linker>
 			</Target>
 			<Target title="Release_Lin">
@@ -39,8 +41,8 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-fexpensive-optimizations" />
-					<Add option="-march=native -O5 -pipe" />
+					<Add option="-O3" />
+					<Add option="-march=native -pipe" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -62,7 +64,8 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add directory="./inc" />
+			<Add option="-std=c99" />
+			<Add directory="./include" />
 		</Compiler>
 		<Linker>
 			<Add directory="./lib" />
@@ -110,6 +113,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="sound.h" />
+		<Unit filename="surprise.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="surprise.h" />
 		<Unit filename="texture.c">
 			<Option compilerVar="CC" />
 		</Unit>

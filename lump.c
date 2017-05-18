@@ -10,13 +10,13 @@ SLump* LumpCreate (float x, float y,
                    int w, int h,
                    float timeToRemove,
                    bool isSpinned,
-                   SDL_Texture** texture)
+                   SDL_Texture* texture)
 {
     SLump* lump = (SLump*) malloc (sizeof(SLump));
 
 
     /* search place for body in physObjects array */
-    register unsigned short i = 0;
+    uint16 i = 0;
     while ((physObjects[i] != NULL) && (i < MAX_PHYSOBJECTS_COUNT))
         i++;
     physObjects[i] = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_LEVEL);
@@ -37,15 +37,14 @@ void LumpCreateSeveral (float x, float y,
                         int w, int h,
                         float timeToRemove,
                         bool isSpinned,
-                        SDL_Texture** texture,
+                        SDL_Texture* texture,
                         const unsigned int num)
 {
-    register short int i, j;
     SLump* lump;
     SPhysObject* physBody;
 
-    j = 0;
-    for (i = 0; i < num; i++)
+    uint16 j = 0;
+    for (uint16 i = 0; i < num; i++)
     {
         while ((lumps[j] != NULL) && (j < MAX_LUMPS_COUNT - 1))
             j++;
@@ -74,9 +73,7 @@ void LumpDestroy (SLump** lump)
 
 void LumpClearAll ()
 {
-    register unsigned short int i;
-
-    for (i = 0; i < MAX_LUMPS_COUNT; i++)
+    for (uint16 i = 0; i < MAX_LUMPS_COUNT; i++)
     {
         if (lumps[i] != NULL)
         {
@@ -87,21 +84,17 @@ void LumpClearAll ()
 
 void LumpGetSdlRect (SLump* lump, SDL_Rect* rect)
 {
-    if (lump != NULL && rect != NULL)
-    {
-        SPhysObject* physBody = physObjects[lump->physBodyIndex];
-        if (physBody == NULL)
-        {
-            rect->x = rect->y = rect->w = rect->h = 0;
-        }
-        else
-        {
-            rect->x = (int)physBody->pos.x;
-            rect->y = (int)physBody->pos.y;
-            rect->w = physBody->w;
-            rect->h = physBody->h;
-        }
-    }
+    if (lump == NULL || rect == NULL)
+        return;
+
+    SPhysObject* physBody = physObjects[lump->physBodyIndex];
+    if (physBody == NULL)
+        return;
+
+    rect->x = (int)(physBody->pos.x - cameraPos.x);
+    rect->y = (int)(physBody->pos.y - cameraPos.y);
+    rect->w = physBody->w;
+    rect->h = physBody->h;
 }
 
 SDL_Texture* LumpGetTexture (SLump* lump)
@@ -109,15 +102,14 @@ SDL_Texture* LumpGetTexture (SLump* lump)
     if (lump == NULL)
         return NULL;
 
-    return *(lump->texture);
+    return lump->texture;
 }
 
 
 void LumpsUpdateAndRender ()
 {
     SLump* lump;
-    register unsigned short int i;
-    for (i = 0; i < MAX_LUMPS_COUNT; i++)
+    for (uint16 i = 0; i < MAX_LUMPS_COUNT; i++)
     {
         lump = lumps[i];
 
@@ -134,6 +126,12 @@ void LumpsUpdateAndRender ()
 
             /* check edges of level */
             SPhysObject* physBody = physObjects[lump->physBodyIndex];
+            if (physBody == NULL)
+            {
+                LumpDestroy (&(lumps[i]));
+                continue;
+            }
+
             short xPos = (short)(physBody->pos.x + (physBody->w >> 1)) / BLOCK_SIZE;
             short yPos = (short)(physBody->pos.y + (physBody->h >> 1)) / BLOCK_SIZE;
 
@@ -146,37 +144,44 @@ void LumpsUpdateAndRender ()
 
 
             /*time for drawing! */
-            SDL_Rect rect;
-            LumpGetSdlRect(lump, &rect);
-
             /* rotate lump */
-            if (lump->isSpinned)
+            if (lump->texture != NULL)
             {
-                if (abs(physBody->impulse.x) > EPSILON)
+                SDL_Rect rect;
+                LumpGetSdlRect(lump, &rect);
+
+                if (lump->isSpinned)
                 {
-                    lump->angle += (physBody->impulse.x) * 100 * deltaTime;
-                    if (lump->angle >= 360.0f)
-                        lump->angle -= 360.0f;
-                    if (lump->angle < 0.0f)
-                        lump->angle += 360.0f;
+                    if (abs(physBody->impulse.x) > EPSILON)
+                    {
+                        lump->angle += (physBody->impulse.x) * 100 * deltaTime;
+                        if (lump->angle >= 360.0f)
+                            lump->angle -= 360.0f;
+                        if (lump->angle < 0.0f)
+                            lump->angle += 360.0f;
+                    }
+
+                    if (physBody->isGrounded)
+                    {
+                        lump->angle = 0.0f;
+                        lump->isSpinned = false;
+                    }
+
+                    SVector2f center;
+                    center.x = physBody->center.x - physBody->pos.x;
+                    center.y = physBody->center.y - physBody->pos.y;
+
+                    /* if rect in screen range */
+                    if ((rect.x + rect.w) > 0 &&
+                        (rect.x <= WINDOW_WIDTH))
+                        EngineRenderImageEx (lump->texture, &rect, lump->angle, &center, SDL_FLIP_NONE);
                 }
-
-                /*if ((abs(physBody->impulse.x) <= 0.0f) &&
-                    (abs(physBody->impulse.y) <= 0.0f))*/
-                if (physBody->isGrounded)
-                {
-                    lump->angle = 0.0f;
-                    lump->isSpinned = false;
-                }
-
-                SVector2f center;
-                center.x = physBody->center.x - physBody->pos.x;
-                center.y = physBody->center.y - physBody->pos.y;
-
-                EngineRenderImageEx (LumpGetTexture(lump), &rect, lump->angle, &center, SDL_FLIP_NONE);
+                else
+                    /* if rect in screen range */
+                    if ((rect.x + rect.w) > 0 &&
+                        (rect.x <= WINDOW_WIDTH))
+                        EngineRenderImage (lump->texture, &rect, false);
             }
-            else
-                EngineRenderImage (LumpGetTexture(lump), &rect, false);
         }
     }
 }

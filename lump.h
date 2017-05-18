@@ -16,7 +16,7 @@ typedef struct
     float timeToRemove;     /* time before destroy */
     float _timeToRemove;    /* delay */
 
-    SDL_Texture** texture;
+    SDL_Texture* texture;
 } SLump;
 
 /* all lumps here */
@@ -27,12 +27,12 @@ SLump* LumpCreate (float x, float y,
                    int w, int h,
                    float timeToRemove,
                    bool isSpinned,
-                   SDL_Texture** texture);
+                   SDL_Texture* texture);
 void LumpCreateSeveral (float x, float y,
                         int w, int h,
                         float timeToRemove,
                         bool isSpinned,
-                        SDL_Texture** texture,
+                        SDL_Texture* texture,
                         const unsigned int num);
 void LumpDestroy (SLump** lump);
 void LumpClearAll ();

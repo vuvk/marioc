@@ -3,6 +3,8 @@
 #include "creature.h"
 
 SCreature* player;
+bool playerCanDamaged;
+int16 playerPrevHealth;
 bool moveL;
 bool moveR;
 
@@ -15,6 +17,6 @@ bool moveR;
 
 
 /* update player state */
-void PlayerUpdate (SCreature* player);
+void PlayerUpdate ();
 /* apply frames for events*/
-void PlayerUpdateFrames (SCreature* player);
+void PlayerUpdateFrames ();

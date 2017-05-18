@@ -9,12 +9,13 @@
 /* типы объектов уровня */
 typedef enum
 {
-    lotBrick,
-    lotMetalBrick,
-    lotBlock,
-    lotCoinBox,
-    lotMushroomBox,
-    lotSurpriseBlockUsed
+    lotNone              = 0,
+    lotBrick             = 1,
+    lotMetalBrick        = 2,
+    lotBlock             = 3,
+    lotCoinBox           = 4,
+    lotMushroomBox       = 5,
+    lotSurpriseBlockUsed = 6
 } ELevelObjectType;
 
 /* объект уровня */
@@ -44,7 +45,8 @@ SLevelObject* LevelObjectCreate (ELevelObjectType levelObjectType,
 void LevelObjectDestroy (SLevelObject** levelObject);
 
 /* загрузка уровня (наполнение массива level) */
-void LevelLoad ();
+void LevelLoad (char* fileName);
+void LevelLoad_old ();
 void LevelClear ();
 
 void LevelUpdateAndRender ();

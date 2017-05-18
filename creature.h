@@ -18,26 +18,17 @@ typedef enum
 typedef struct
 {
     ECreatureType creatureType;
-    short health;
+    int16 health;
 
-    unsigned short physBodyIndex;
-    //SPhysObject* physBody;
-    /*SVector2f pos;
-    SVector2f center;
-    int w, h;
-    int halfW, halfH;
-    SVector2f impulse;*/
+    uint16 physBodyIndex;
 
     char xDir;           /* -1 влево 1 вправо*/
     float moveSpeed;     /* скорость движения максимальная */
     float accelSpeed;    /* ускорение */
 
-    /*float friction;
-    bool isGrounded;*/
-
     /* текстуры */
     SDL_Texture** textures;
-    unsigned short texCount;
+    uint16 texCount;
 
     /* анимация */
     short startFrame, endFrame;
@@ -88,4 +79,4 @@ void CreatureUpdateAI (SCreature* creature);
                          SLevelObject** obstacleLevelObject,
                          SCreature** obstacleCreature);*/
 
-void CreaturesUpdate();
+void CreaturesUpdateAndRender();

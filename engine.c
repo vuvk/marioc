@@ -1,8 +1,15 @@
 #include <time.h>
 
 #include "engine.h"
+#include "sound.h"
 #include "texture.h"
 #include "level.h"
+#include "physObj.h"
+#include "creature.h"
+#include "corpse.h"
+#include "lump.h"
+#include "surprise.h"
+#include "player.h"
 
 /* время в начале и в конце кадра */
 unsigned long int startTick, endTick;
@@ -19,7 +26,7 @@ bool EngineStart()
     deltaTime = delayTime = 0.0f;
     fps = fpsCounter = 0;
 
-    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0)
+    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_TIMER) != 0)
     {
         printf ("SDL_Init Error: %s\n", SDL_GetError());
         return false;
@@ -62,12 +69,39 @@ bool EngineCreateRenderer (int index, unsigned long flags)
 
 bool EngineInitAudio()
 {
-    return (Mix_OpenAudio (44100, MIX_DEFAULT_FORMAT, 2, 2048) >= 0);
+    audioSystemLoaded = (Mix_OpenAudio (22050, MIX_DEFAULT_FORMAT, 2, 1024) >= 0);
+    return audioSystemLoaded;
 }
 
 SDL_Texture* EngineLoadTexture (const char* fileName)
 {
     return IMG_LoadTexture(sdlRenderer, fileName);
+}
+
+SDL_Texture* EngineLoadTextureFromStrip (SDL_Texture* srcTexture, const SDL_Rect* srcRect)
+{
+    if (srcTexture == NULL || srcRect == NULL)
+        return NULL;
+
+    /* prepare new SDL_Texture and rect */
+    SDL_Texture* dstTexture = SDL_CreateTexture (sdlRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, srcRect->w, srcRect->h);
+    SDL_Rect dstRect;
+    dstRect.x = dstRect.y = 0;
+    dstRect.w = srcRect->w;
+    dstRect.h = srcRect->h;
+
+    /* render to new texture */
+    SDL_SetRenderTarget (sdlRenderer, dstTexture);
+    //SDL_SetRenderDrawColor (sdlRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor (sdlRenderer, 0, 0, 0, 0);
+    SDL_RenderClear (sdlRenderer);
+    SDL_RenderCopy (sdlRenderer, srcTexture, srcRect, &dstRect);
+    SDL_RenderPresent (sdlRenderer);
+
+    SDL_RenderClear (sdlRenderer);
+    SDL_SetRenderTarget (sdlRenderer, NULL);
+
+    return dstTexture;
 }
 
 
@@ -76,53 +110,11 @@ void EngineRenderClear()
     SDL_RenderClear(sdlRenderer);
 }
 
-
-/*void EngineUpdateAndRenderLevel()
-{
-    int r, c;
-    SDL_Rect rect;
-    SLevelObject* levelObject;
-    rect.x = 0;
-    rect.y = 0;
-    rect.w = BLOCK_SIZE;
-    rect.h = BLOCK_SIZE;
-
-    for (r = 0; r < LEVEL_HEIGHT; r ++)
-    {
-        for (c = 0; c < LEVEL_WIDTH; c ++)
-        {
-            levelObject = level[r][c];
-
-            if (levelObject != NULL)
-            {
-                // update levelObject position...
-                levelObject->center.x = levelObject->pos.x + (BLOCK_SIZE >> 1);
-                levelObject->center.y = levelObject->pos.y + (BLOCK_SIZE >> 1);
-
-                float distY = levelObject->pos.y - levelObject->startPos.y;
-                if (abs (distY) > EPSILON)
-                {
-                    if (levelObject->pos.y < levelObject->startPos.y)
-                        levelObject->pos.y += deltaTime*BLOCK_SIZE;
-
-                    if (levelObject->pos.y > levelObject->startPos.y)
-                        levelObject->pos.y -= deltaTime*BLOCK_SIZE;
-                }
-                else
-                    if (distY != 0.0f)
-                        levelObject->pos.y = levelObject->startPos.y;
-
-                rect.x = (int)(levelObject->pos.x);
-                rect.y = (int)(levelObject->pos.y);
-
-                SDL_RenderCopy (sdlRenderer, levelTextures [levelObject->texIndex], NULL, &rect);
-            }
-        }
-    }
-}*/
-
 void EngineRenderImage (SDL_Texture* texture, const SDL_Rect* rect, bool flipX)
 {
+    if (texture == NULL || rect == NULL)
+        return;
+
     if (!flipX)
     {
         SDL_RenderCopy(sdlRenderer, texture, NULL, rect);
@@ -140,11 +132,22 @@ void EngineRenderImageEx (SDL_Texture* texture, const SDL_Rect* rect,
                           const SVector2f* center,
                           const SDL_RendererFlip flip)
 {
+    if (texture == NULL || rect == NULL || center == NULL)
+        return;
+
     SDL_Point point;
     point.x = (int)(center->x);
     point.y = (int)(center->y);
 
     SDL_RenderCopyEx (sdlRenderer, texture, NULL, rect, angle, &point, flip);
+}
+
+void EngineRenderTile (SDL_Texture* tiles, const SDL_Rect* srcRect, const SDL_Rect* dstRect)
+{
+    if (tiles == NULL || srcRect == NULL || dstRect == NULL)
+        return;
+
+    SDL_RenderCopy (sdlRenderer, tiles, srcRect, dstRect);
 }
 
 void EngineRenderPresent()
@@ -154,11 +157,8 @@ void EngineRenderPresent()
 
 void EngineUpdateTime()
 {
-    while (deltaTime < LIMIT_FPS)
-    {
-        startTick = SDL_GetPerformanceCounter();
-        deltaTime = (float)(startTick - endTick) / SDL_GetPerformanceFrequency();
-    }
+    startTick = SDL_GetPerformanceCounter();
+    deltaTime = (float)(startTick - endTick) / SDL_GetPerformanceFrequency();
     endTick = startTick;
 
     fpsCounter++;
@@ -169,4 +169,14 @@ void EngineUpdateTime()
         fps = fpsCounter;
         fpsCounter = 0;
     }
+}
+
+void EngineClearAllInstances()
+{
+    CreatureClearAll();
+    CorpseClearAll();
+    LumpClearAll();
+    SurpriseClearAll();
+    PhysObjectClearAll();
+    player = NULL;
 }

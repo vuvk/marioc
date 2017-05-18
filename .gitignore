@@ -32,12 +32,13 @@
 *.dSYM/
 *.su
 *.save
+*.depend
 
 bin/*
 
 # Folders
 !bin/media
-!bin/media
+include
 inc
 lib
 obj

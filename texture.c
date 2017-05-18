@@ -5,7 +5,7 @@
 
 
 
-void LoadTexture (SDL_Texture** texture, const char* fileName)
+void TextureLoad (SDL_Texture** texture, const char* fileName)
 {
     if (FileExists (fileName))
         *texture = EngineLoadTexture (fileName);
@@ -15,33 +15,45 @@ void LoadTexture (SDL_Texture** texture, const char* fileName)
 
 void LoadTextures()
 {
-    register unsigned short i;
-    char buffer[30];
+    uint16 i;
+    char textBuffer[30];
 
     /* TEXTURES for PLAYER */
     for (i = 0; i < 7; i++)
     {
-        sprintf (buffer, "./media/tex/player%i.png", i);
-        LoadTexture (&playerTextures[i], buffer);
+        sprintf (textBuffer, "./media/tex/player%i.png", i);
+        TextureLoad (&playerTextures[i], textBuffer);
+    }
+    /* TEXTURES for BIG PLAYER */
+    for (i = 0; i < 6; i++)
+    {
+        sprintf (textBuffer, "./media/tex/big_player%i.png", i);
+        TextureLoad (&playerTextures[i + 7], textBuffer);
     }
 
     /* TEXTURES for GOOMBA */
     for (i = 0; i < 3; i++)
     {
-        sprintf (buffer, "./media/tex/goomba%i.png", i);
-        LoadTexture (&goombaTextures[i], buffer);
+        sprintf (textBuffer, "./media/tex/goomba%i.png", i);
+        TextureLoad (&goombaTextures[i], textBuffer);
     }
 
     /* TEXTURES for LEVEL OBJECTS */
-    /* background */
-    LoadTexture (&levelTextures[0], "./media/tex/background.png");
-    /* blocks */
-    LoadTexture (&levelTextures[1], "./media/tex/block.png");
-    LoadTexture (&levelTextures[2], "./media/tex/red_brick.png");
-    LoadTexture (&levelTextures[3], "./media/tex/bonus_block0.png");
-    LoadTexture (&levelTextures[4], "./media/tex/bonus_block3.png");
+    TextureLoad (&levelTextures, "./media/tex/tiles.png");
+
+    /* surprises */
+    TextureLoad (&surpriseTextures[0], "./media/tex/mushroom.png");
 
     /* misc */
-    LoadTexture (&miscTextures[0], "./media/tex/brick.png");
-    LoadTexture (&miscTextures[1], "./media/tex/blood.png");
+    TextureLoad (&miscTextures[0], "./media/tex/brick.png");
+    TextureLoad (&miscTextures[1], "./media/tex/blood.png");
+}
+
+void TextureArraySetColor (SDL_Texture** textures, const ubyte r, const ubyte g, const ubyte b, uint16 count)
+{
+    for (uint16 i = 0; i < count; i++)
+    {
+        SDL_SetTextureColorMod (*textures, r, g, b);
+        textures++;
+    }
 }

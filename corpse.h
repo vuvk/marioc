@@ -17,18 +17,18 @@ typedef struct
     float timeToRemove;     /* time before destroy */
     float _timeToRemove;    /* delay */
 
-    SDL_Texture** texture;  /* */
+    SDL_Texture* texture;  /* */
 } SCorpse;
 
 /* all corpses here */
 SCorpse* corpses[MAX_CREATURES_COUNT];
 
 /* constructor|destructor */
-SCorpse* CorpseCreate (float x, float y, int w, int h, float timeToRemove, SDL_Texture** texture);
+SCorpse* CorpseCreate (float x, float y, ubyte w, ubyte h, float timeToRemove, SDL_Texture* texture);
 void CorpseDestroy (SCorpse** corpse);
 void CorpseClearAll ();
 
 void CorpseGetSdlRect (SCorpse* corpse, SDL_Rect* rect);
 SDL_Texture* CorpseGetTexture (SCorpse* corpse);
 
-void CorpsesUpdate ();
+void CorpsesUpdateAndRender ();
