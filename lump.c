@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "defines.h"
 #include "engine.h"
 #include "level.h"
 #include "lump.h"
@@ -14,14 +15,8 @@ SLump* LumpCreate (float x, float y,
 {
     SLump* lump = (SLump*) malloc (sizeof(SLump));
 
-
-    /* search place for body in physObjects array */
-    uint16 i = 0;
-    while ((physObjects[i] != NULL) && (i < MAX_PHYSOBJECTS_COUNT))
-        i++;
-    physObjects[i] = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_LEVEL);
-    lump->physBodyIndex = i;
-
+    lump->physBody = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_LEVEL);
+    ListAddElement (physObjects, lump->physBody);
 
     lump->angle = 0.0f;
     lump->isSpinned = isSpinned;
@@ -38,23 +33,17 @@ void LumpCreateSeveral (float x, float y,
                         float timeToRemove,
                         bool isSpinned,
                         SDL_Texture* texture,
-                        const unsigned int num)
+                        const uint32 count)
 {
     SLump* lump;
-    SPhysObject* physBody;
-
-    uint16 j = 0;
-    for (uint16 i = 0; i < num; i++)
+    for (uint32 i = 0; i < count; i++)
     {
-        while ((lumps[j] != NULL) && (j < MAX_LUMPS_COUNT - 1))
-            j++;
-
         lump = LumpCreate (x, y, w, h, timeToRemove, isSpinned, texture);
-        physBody = physObjects[lump->physBodyIndex];
-        PhysObjectAddImpulse (physBody, (rand () % 101) / 10.0f - 5.0f, (rand () % 101) / 10.0f - 5.0f);
-        lumps [j] = lump;
+        /* random direction */
+        if (lump->physBody)
+            PhysObjectAddImpulse (lump->physBody, (rand () % 1001) / 100.0f - 5.0f, (rand () % 1001) / 100.0f - 5.0f);
 
-        j++;
+        ListAddElement (lumps, lump);
     }
 }
 
@@ -63,9 +52,8 @@ void LumpDestroy (SLump** lump)
     if (lump == NULL || *lump == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[(*lump)->physBodyIndex];
-    if (physBody != NULL)
-        PhysObjectDestroy (&(physObjects[(*lump)->physBodyIndex]));
+    if ((*lump)->physBody != NULL)
+        ListDeleteElementByValue (physObjects, (*lump)->physBody);
 
     free (*lump);
     *lump = NULL;
@@ -73,23 +61,21 @@ void LumpDestroy (SLump** lump)
 
 void LumpClearAll ()
 {
-    for (uint16 i = 0; i < MAX_LUMPS_COUNT; i++)
+    for (SListElement* element = lumps->first; element; element = element->next)
     {
-        if (lumps[i] != NULL)
-        {
-            LumpDestroy (&(lumps[i]));
-        }
+        if (element->value != NULL)
+            LumpDestroy ((SLump**) &element->value);
     }
+
+    ListClear (lumps);
 }
 
 void LumpGetSdlRect (SLump* lump, SDL_Rect* rect)
 {
-    if (lump == NULL || rect == NULL)
+    if (lump == NULL || lump->physBody == NULL || rect == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[lump->physBodyIndex];
-    if (physBody == NULL)
-        return;
+    SPhysObject* physBody = lump->physBody;
 
     rect->x = (int)(physBody->pos.x - cameraPos.x);
     rect->y = (int)(physBody->pos.y - cameraPos.y);
@@ -108,43 +94,58 @@ SDL_Texture* LumpGetTexture (SLump* lump)
 
 void LumpsUpdateAndRender ()
 {
+    if (lumps->first == NULL)
+        return;
+
     SLump* lump;
-    for (uint16 i = 0; i < MAX_LUMPS_COUNT; i++)
+    SListElement* element = lumps->first;
+    while (element != NULL)
     {
-        lump = lumps[i];
+        lump = NULL;
+        if (element)
+            lump = (SLump*) element->value;
 
         if (lump != NULL)
         {
-            lump->_timeToRemove += deltaTime;
+            SPhysObject* physBody = lump->physBody;
 
-            /* remove if time out */
-            if (lump->_timeToRemove >= lump->timeToRemove)
-            {
-                LumpDestroy (&(lumps[i]));
-                continue;
-            }
-
-            /* check edges of level */
-            SPhysObject* physBody = physObjects[lump->physBodyIndex];
             if (physBody == NULL)
             {
-                LumpDestroy (&(lumps[i]));
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue(lumps, lump);
+                element = nextElement;
+
                 continue;
             }
 
+            // check edges of level
             short xPos = (short)(physBody->pos.x + (physBody->w >> 1)) / BLOCK_SIZE;
             short yPos = (short)(physBody->pos.y + (physBody->h >> 1)) / BLOCK_SIZE;
-
-            if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-                yPos < 0 || yPos >= LEVEL_HEIGHT)
+            if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+                yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
             {
-                LumpDestroy (&(lumps[i]));
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, lump->physBody);
+                ListDeleteElementByValue (lumps, lump);
+                element = nextElement;
+
                 continue;
             }
 
+            // remove if time out
+            lump->_timeToRemove += deltaTime;
+            if (lump->_timeToRemove >= lump->timeToRemove)
+            {
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, lump->physBody);
+                ListDeleteElementByValue(lumps, lump);
+                element = nextElement;
 
-            /*time for drawing! */
-            /* rotate lump */
+                continue;
+            }
+
+            // time for drawing!
+            // rotate lump
             if (lump->texture != NULL)
             {
                 SDL_Rect rect;
@@ -171,17 +172,19 @@ void LumpsUpdateAndRender ()
                     center.x = physBody->center.x - physBody->pos.x;
                     center.y = physBody->center.y - physBody->pos.y;
 
-                    /* if rect in screen range */
+                    // if rect in screen range
                     if ((rect.x + rect.w) > 0 &&
                         (rect.x <= WINDOW_WIDTH))
                         EngineRenderImageEx (lump->texture, &rect, lump->angle, &center, SDL_FLIP_NONE);
                 }
                 else
-                    /* if rect in screen range */
+                    // if rect in screen range
                     if ((rect.x + rect.w) > 0 &&
                         (rect.x <= WINDOW_WIDTH))
                         EngineRenderImage (lump->texture, &rect, false);
             }
         }
+
+        element = element->next;
     }
 }

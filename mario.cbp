@@ -32,7 +32,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -llibxml2 -liconv" />
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -llibxml2" />
 				</Linker>
 			</Target>
 			<Target title="Release_Lin">
@@ -46,7 +46,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
+					<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lxml2" />
 				</Linker>
 			</Target>
 			<Target title="Debug_Lin">
@@ -59,7 +59,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer" />
+					<Add option="-lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lxml2" />
 				</Linker>
 			</Target>
 		</Build>
@@ -91,6 +91,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="level.h" />
+		<Unit filename="list.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="list.h" />
 		<Unit filename="lump.c">
 			<Option compilerVar="CC" />
 		</Unit>

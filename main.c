@@ -1,3 +1,30 @@
+/**
+ *
+ * (EN) clone of "super mario bros" from nes in pure C from scratch
+ * (RU) клон игры "super mario bros" с денди на чистом Си с нуля
+ *
+ * (EN) only basis - physics, animation, creatures, lumps, loading levels from Tiled Map Editor
+ * (RU) реализована только база: физика, анимация, сущности, загрузка уровней формата Tiled Map Editor
+ *
+ * (EN) Used libraries:
+ * (RU) Использованы библиотеки:
+ *
+ *      SDL2        (libsdl2)
+ *      SDL2_image  (libsdl2-image)
+ *      SDL2_mixer  (libsdl2-mixer)
+ *      libxml2
+ *      libpng16-16
+ *
+ *
+ * GNU General Public License v3.0 (https://github.com/vuvk/marioc/blob/master/LICENSE)
+ * 2017, Vuvk
+ *
+ *
+ * P.S.: проект разрабатывался в рамках изучения языка Си. Так что не серчайте, братухи.
+ */
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -180,7 +207,7 @@ int main (int argc, char *argv[])
                     {
                         if (player != NULL)
                         {
-                            SPhysObject* physBody = physObjects[player->physBodyIndex];
+                            SPhysObject* physBody = player->physBody;
                             if (physBody != NULL && physBody->isGrounded)
                             {
                                 bool canJump = true;
@@ -225,7 +252,7 @@ int main (int argc, char *argv[])
                     {
                         if (player != NULL)
                         {
-                            SPhysObject* physBody = physObjects[player->physBodyIndex];
+                            SPhysObject* physBody = player->physBody;
                             if ((physBody != NULL) && (player->health == 2))
                             {
                                 /*physBody->h = BLOCK_SIZE;*/
@@ -245,19 +272,32 @@ int main (int argc, char *argv[])
                         break;
                     }
 
-
                     case SDLK_q :
                     {
-                        int i, count = 0;
-                        for (i = 0; i < MAX_CREATURES_COUNT; i++)
-                        {
-                            if (corpses[i] != NULL)
-                                count ++;
-                        }
-                        printf("corpses - %d\n", count);
+                        int count = 0;
+                        /*for (SListElement* element = lumps->first; element; element = element->next)
+                            count++;
+                        printf ("lumps length - %d\n", lumps->size);
+                        printf ("fact lumps length - %d!!!\n", count);
+
+                        count = 0;
+                        for (SListElement* element = surprises->first; element; element = element->next)
+                            count++;
+                        printf ("surprises length - %d\n", surprises->size);
+                        printf ("fact surprises length - %d!!!\n", count);*/
+                        for (SListElement* element = corpses->first; element; element = element->next)
+                            count++;
+                        printf ("corpses length - %d\n", corpses->size);
+                        printf ("fact corpses length - %d!!!\n", count);
+
+                        count = 0;
+                        for (SListElement* element = creatures->first; element; element = element->next)
+                            count++;
+                        printf ("creatures length - %d\n", creatures->size);
+                        printf ("fact creatures length - %d!!!\n", count);
+
                         break;
                     }
-
 
                     case SDLK_ESCAPE :
                     {
@@ -290,7 +330,7 @@ int main (int argc, char *argv[])
                     {
                         if (player != NULL)
                         {
-                            SPhysObject* physBody = physObjects[player->physBodyIndex];
+                            SPhysObject* physBody = player->physBody;
                             if ((physBody != NULL) && (player->health == 1))
                             {
                                 /*physBody->h = BLOCK_SIZE << 1;*/
@@ -320,7 +360,7 @@ int main (int argc, char *argv[])
         /* player movement */
         if (player != NULL)
         {
-            SPhysObject* physBody = physObjects[player->physBodyIndex];
+            SPhysObject* physBody = player->physBody;
 
             if (!moveL && !moveR)
             {
@@ -370,11 +410,7 @@ int main (int argc, char *argv[])
             SDL_Delay ((int)(frameRate - deltaTime));
     }
 
-    CreatureClearAll();
-    CorpseClearAll();
-    LumpClearAll();
-    SurpriseClearAll();
-    PhysObjectClearAll();
+    EngineClearAllInstances();
     LevelClear();
 
     EngineStop();

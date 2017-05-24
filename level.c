@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "libxml/parser.h"
 
 #include "additions.h"
@@ -8,27 +11,6 @@
 #include "lump.h"
 #include "surprise.h"
 #include "player.h"
-
-
-/* временный массив уровня */
-char levelData [LEVEL_HEIGHT][LEVEL_WIDTH] =
-{
-    "####################################",
-    "#                                  #",
-    "#                                  #",
-    "#      g                           #",
-    "#                                  #",
-    "#          g   g                   #",
-    "#   p                              #",
-    "#        #                         #",
-    "#     b                            #",
-    "#        b     #                   #",
-    "#              #                    ",
-    "# m        bbb         bmb          ",
-    "#     b##b         #                ",
-    "#            #     #              # ",
-    "##############   ################## "
-};
 
 
 SLevelObject* LevelObjectCreate (ELevelObjectType levelObjectType,
@@ -79,24 +61,24 @@ void XmlParsing (xmlNode* start_node, int lvl)
 {
     if (start_node)
     {
-        for (xmlNode* node = start_node; node; node = node->next)
+        xmlNode* node;
+        for (node = start_node; node; node = node->next)
         {
-            if (strcmp (node->name, "text") != 0)
+            if (strcmp ((char*) node->name, "text") != 0)
             {
                 // level objects
-                if (strcmp (node->name, "data") == 0)
+                if (strcmp ((char*) node->name, "data") == 0)
                 {
                     // номера тайлов представленные в формате csv
-                    xmlChar* csv = xmlNodeGetContent(node);
+                    char* csv = (char*) xmlNodeGetContent(node);
+                    //printf("%s", csv);
 
-                    uint16 numberOfBlock = 1;
-                    char* pch = strtok (csv, ",");
+                    uint16 numberOfBlock = 0;
+                    char* pch = strtok (csv, ",.-; ");
+                    int textureIndex;
                     while (pch != NULL)
                     {
-                        //printf("%s,", pch);
-                        pch = strtok (NULL, ",");
-
-                        int16 textureIndex = atoi (pch) - 1;
+                        textureIndex = atoi (pch) - 1;
                         if (textureIndex > 0)
                         {
                             float x = (numberOfBlock % LEVEL_WIDTH) * BLOCK_SIZE;
@@ -145,16 +127,22 @@ void XmlParsing (xmlNode* start_node, int lvl)
                             level[numberOfBlock / LEVEL_WIDTH][numberOfBlock % LEVEL_WIDTH] = levelObject;
                         }
 
+                        pch = strtok (NULL, ",.-; ");
                         numberOfBlock++;
                     }
+
+                    free (csv);
+                    free (pch);
+                    csv = NULL;
+                    pch = NULL;
                 }
 
                 // creatures or another objects
-                if (strcmp (node->name, "object") == 0)
+                if (strcmp ((char*) node->name, "object") == 0)
                 {
-                    xmlChar* name = xmlGetProp (node, "name");
-                    xmlChar* xStr = xmlGetProp (node, "x");
-                    xmlChar* yStr = xmlGetProp (node, "y");
+                    char* name = (char*) xmlGetProp (node, (xmlChar*) "name");
+                    char* xStr = (char*) xmlGetProp (node, (xmlChar*) "x");
+                    char* yStr = (char*) xmlGetProp (node, (xmlChar*) "y");
 
                     float x = atof (xStr) * (BLOCK_SIZE / TILE_SIZE);
                     float y = atof (yStr) * (BLOCK_SIZE / TILE_SIZE);
@@ -162,15 +150,16 @@ void XmlParsing (xmlNode* start_node, int lvl)
                     // PLAYER
                     if (strcmp (name, "player") == 0)
                     {
-                        creatures[creaturesCount] = CreatureCreate (ctPlayer,                   // type
-                                                                    1,                          // health
-                                                                    x, y,                       // position
-                                                                    BLOCK_SIZE, BLOCK_SIZE,     // size
-                                                                    BLOCK_SIZE / 5.0f,          // movement speed
-                                                                    &playerTextures[0], 13,     // textures and number of textures
-                                                                    0.1f);                      // speed of animation
+                        SCreature* creature = CreatureCreate (ctPlayer,                   // type
+                                                              1,                          // health
+                                                              x, y,                       // position
+                                                              BLOCK_SIZE, BLOCK_SIZE,     // size
+                                                              BLOCK_SIZE / 5.0f,          // movement speed
+                                                              &playerTextures[0], 13,     // textures and number of textures
+                                                              0.1f);                      // speed of animation
                         // link for player
-                        player = creatures [creaturesCount];
+                        player = creature;
+                        ListAddElement (creatures, creature);
 
                         playerCanDamaged = true;
                         playerPrevHealth = 1;
@@ -180,24 +169,33 @@ void XmlParsing (xmlNode* start_node, int lvl)
                     // GOOMBA
                     if (strcmp (name, "goomba") == 0)
                     {
-                        creatures[creaturesCount] = CreatureCreate (ctGoomba,                   // type
-                                                                    1,                          // health
-                                                                    x, y,                       // position
-                                                                    BLOCK_SIZE, BLOCK_SIZE,     // size
-                                                                    2.5f,                       // movement speed
-                                                                    &goombaTextures[0], 2,      // textures and number of textures
-                                                                    0.1f);                      // speed of animation
+                        SCreature* creature = CreatureCreate (ctGoomba,                   // type
+                                                              1,                          // health
+                                                              x, y,                       // position
+                                                              BLOCK_SIZE, BLOCK_SIZE,     // size
+                                                              2.5f,                       // movement speed
+                                                              &goombaTextures[0], 2,      // textures and number of textures
+                                                              0.1f);                      // speed of animation
+                        ListAddElement (creatures, creature);
                     }
 
-                    creaturesCount ++;
+                    // free shit
+                    free (name);
+                    free (xStr);
+                    free (yStr);
+                    name = NULL;
+                    xStr = NULL;
+                    yStr = NULL;
                 }
-
 
                 // search all children node, if exists
                 if (node->children)
                     XmlParsing(node->children, lvl + 1);
             }
         }
+
+        xmlFreeNode (node);
+        node = NULL;
     }
 }
 
@@ -220,115 +218,13 @@ void LevelLoad (char* fileName)
 
     XmlParsing (root->children, 1);
 
-    // xmlFreeNode (root);
+    //xmlFreeNode (root);
     xmlFreeDoc (document);
     printf ("Level loaded!\n");
+
+    root = NULL;
+    document = NULL;
 }
-
-void LevelLoad_old ()
-{
-    CreatureClearAll();
-    CorpseClearAll();
-    LumpClearAll();
-    SurpriseClearAll();
-    PhysObjectClearAll();
-    LevelClear();
-    char symbol;
-
-    for (uint16 r = 0; r < LEVEL_HEIGHT; r++)
-    {
-        for (uint16 c = 0; c < LEVEL_WIDTH; c++)
-        {
-            symbol = levelData [r][c];
-
-            switch (symbol)
-            {
-                /* anybody */
-                case 'p' :
-                case 'g' :
-                {
-                    /* creature creating */
-                    switch (symbol)
-                    {
-                        /* player */
-                        case 'p' :
-                        {
-                            creatures[creaturesCount] = CreatureCreate (ctPlayer,                        /* type */
-                                                                        1,                               /* health */
-                                                                        c * BLOCK_SIZE, r * BLOCK_SIZE,  /* position */
-                                                                        BLOCK_SIZE, BLOCK_SIZE,          /* size */
-                                                                        5.0f,                            /* movement speed */
-                                                                        &playerTextures[0], 13,          /* textures and number of textures */
-                                                                        0.1f);                           /* speed of animation */
-                            /* link for player */
-                            player = creatures [creaturesCount];
-
-                            playerCanDamaged = true;
-                            playerPrevHealth = 1;
-                            TextureArraySetColor (player->textures, 255, 255, 255, player->texCount);
-
-                            break;
-                        }
-
-                        /* goomba */
-                        case 'g' :
-                        {
-                            creatures[creaturesCount] = CreatureCreate (ctGoomba,                        /* type */
-                                                                        1,                               /* health */
-                                                                        c * BLOCK_SIZE, r * BLOCK_SIZE,  /* position */
-                                                                        BLOCK_SIZE - 2, BLOCK_SIZE - 2,  /* size */
-                                                                        2.5f,                            /* movement speed */
-                                                                        &goombaTextures[0], 2,           /* textures and number of textures */
-                                                                        0.1f);                           /* speed of animation */
-                            break;
-                        }
-                    }
-
-                    creaturesCount++;
-                    break;
-                }
-
-                /* solid block */
-                case '#' :
-                {
-                    level [r][c] = LevelObjectCreate (lotBlock, c * BLOCK_SIZE, r * BLOCK_SIZE, true, true, 1);
-                    break;
-                }
-
-                /* red brick */
-                case 'b' :
-                {
-                    level [r][c] = LevelObjectCreate (lotBrick, c * BLOCK_SIZE, r * BLOCK_SIZE, true, false, 2);
-                    break;
-                }
-
-                /* surprise block */
-                case 'c' :
-                {
-                    level [r][c] = LevelObjectCreate (lotCoinBox, c * BLOCK_SIZE, r * BLOCK_SIZE, true, false, 3);
-                    break;
-                }
-                case 'm' :
-                {
-                    level [r][c] = LevelObjectCreate (lotMushroomBox, c * BLOCK_SIZE, r * BLOCK_SIZE, true, false, 3);
-                    break;
-                }
-
-                default :
-                {
-                    if (level [r][c] != NULL)
-                    {
-                        free (level[r][c]);
-                        level [r][c] = NULL;
-                    }
-
-                    break;
-                }
-            }
-        }
-    }
-}
-
 
 void LevelUpdateAndRender ()
 {

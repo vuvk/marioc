@@ -18,11 +18,10 @@ void EngineSetWindowTitle (const char* title);
 bool EngineCreateRenderer (int index, unsigned long flags);
 bool EngineInitAudio();
 SDL_Texture* EngineLoadTexture (const char* fileName);
-SDL_Texture* EngineLoadTextureFromStrip (SDL_Texture* srcTexture, const SDL_Rect* srcRect);
+//SDL_Texture* EngineLoadTextureFromStrip (SDL_Texture* srcTexture, const SDL_Rect* srcRect);
 
 
 void EngineRenderClear();
-//void EngineUpdateAndRenderLevel();
 void EngineRenderImage (SDL_Texture* texture, const SDL_Rect* rect, bool flipX);
 void EngineRenderImageEx (SDL_Texture* texture, const SDL_Rect* rect,
                           const double angle,

@@ -2,13 +2,13 @@
 
 #include "SDL2/SDL.h"
 
-#include "defines.h"
+#include "list.h"
 #include "physObj.h"
 
 
 typedef struct
 {
-    unsigned short int physBodyIndex;
+    SPhysObject* physBody;
 
     bool isSpinned;         /* вращается? */
     float angle;
@@ -19,8 +19,9 @@ typedef struct
     SDL_Texture* texture;
 } SLump;
 
+
 /* all lumps here */
-SLump* lumps[MAX_LUMPS_COUNT];
+SList* lumps;
 
 /* constructor|destructor */
 SLump* LumpCreate (float x, float y,
@@ -33,7 +34,7 @@ void LumpCreateSeveral (float x, float y,
                         float timeToRemove,
                         bool isSpinned,
                         SDL_Texture* texture,
-                        const unsigned int num);
+                        const uint32 count);
 void LumpDestroy (SLump** lump);
 void LumpClearAll ();
 

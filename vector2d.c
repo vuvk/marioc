@@ -4,7 +4,6 @@
 #include "vector2d.h"
 
 
-/* float vector */
 SVector2f AddVector2f (SVector2f v1, SVector2f v2)
 {
     SVector2f ret;

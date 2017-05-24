@@ -1,3 +1,7 @@
+#include <math.h>
+#include <stdlib.h>
+
+
 #include "defines.h"
 #include "additions.h"
 #include "physObj.h"
@@ -33,11 +37,7 @@ void PhysObjectDestroy (SPhysObject** physObject)
 
 void PhysObjectClearAll ()
 {
-    for (uint16 i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
-    {
-        if (physObjects[i] != NULL)
-            PhysObjectDestroy(&(physObjects[i]));
-    }
+    ListClear (physObjects);
 }
 
 void PhysObjectUpdateState (SPhysObject* physObject)
@@ -198,9 +198,9 @@ void PhysObjectUpdatePhysics (SPhysObject* physObject)
         if (physObject->collisionFlag == PHYSOBJ_COLLISION_WITH_ALL)
         {
             SPhysObject* anotherPhysObject;
-            for (i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
+            for (SListElement* element = physObjects->first; element; element = element->next)
             {
-                anotherPhysObject = physObjects[i];
+                anotherPhysObject = (SPhysObject*) element->value;
                 if ((anotherPhysObject != NULL) &&
                     (anotherPhysObject != physObject) &&
                     (anotherPhysObject->collisionFlag == PHYSOBJ_COLLISION_WITH_ALL))
@@ -285,8 +285,8 @@ bool IsPlaceFree (float x, float y,
     /* check elements of level */
     short xPos = (short)x / BLOCK_SIZE;
     short yPos = (short)y / BLOCK_SIZE;
-    if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-        yPos < 0 || yPos >= LEVEL_HEIGHT)
+    if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+        yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
         return false;
 
     SLevelObject* levelObject = level[yPos][xPos];
@@ -297,13 +297,13 @@ bool IsPlaceFree (float x, float y,
         return false;
     }
 
-    /* check another physObjects... */
     if (checkAll)
     {
         SPhysObject* physObject;
-        for (uint16 i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
+        for (SListElement* element = physObjects->first; element; element = element->next)
         {
-            physObject = physObjects[i];
+            physObject = (SPhysObject*) element->value;
+
             if (physObject != NULL)
             {
                 if (physObject->collisionFlag < PHYSOBJ_COLLISION_WITH_ALL)
@@ -370,24 +370,30 @@ bool PhysObjectIsCollisionLevelObject (SPhysObject* o1, SLevelObject* l2)
 void PhysObjectsUpdate()
 {
     SPhysObject* physObject;
-    for (uint16 i = 0; i < MAX_PHYSOBJECTS_COUNT; i++)
+    SListElement* element = physObjects->first;
+    while (element != NULL)
     {
-        physObject = physObjects[i];
+        physObject = (SPhysObject*) element->value;
 
         if (physObject != NULL)
         {
-            PhysObjectUpdateState(physObject);
-            PhysObjectUpdatePhysics(physObject);
-
-            /* check edges of level */
+            // check edges of level
             short xPos = (short)physObject->center.x / BLOCK_SIZE;
             short yPos = (short)physObject->center.y / BLOCK_SIZE;
-            if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-                yPos < 0 || yPos >= LEVEL_HEIGHT)
+            if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+                yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
             {
-                PhysObjectDestroy (&(physObjects[i]));
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, physObject);
+                element = nextElement;
+
                 continue;
             }
+
+            PhysObjectUpdateState(physObject);
+            PhysObjectUpdatePhysics(physObject);
         }
+
+        element = element->next;
     }
 }

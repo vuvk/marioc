@@ -2,6 +2,7 @@
 
 #include "SDL2/SDL.h"
 
+#include "list.h"
 #include "level.h"
 #include "physObj.h"
 
@@ -20,7 +21,7 @@ typedef struct
     ECreatureType creatureType;
     int16 health;
 
-    uint16 physBodyIndex;
+    SPhysObject* physBody;
 
     char xDir;           /* -1 влево 1 вправо*/
     float moveSpeed;     /* скорость движения максимальная */
@@ -38,9 +39,7 @@ typedef struct
 } SCreature;
 
 /* набор всех созданий */
-/* ЗАМЕНИТЬ НА СПИСОК! */
-SCreature* creatures [MAX_CREATURES_COUNT];
-unsigned short creaturesCount;
+SList* creatures;
 
 /* имитация конструктора */
 SCreature* CreatureCreate (ECreatureType creatureType,
@@ -73,10 +72,5 @@ void CreatureGetSdlRect (SCreature* creature, SDL_Rect* rect);
 SDL_Texture* CreatureGetTexture (SCreature* creature, int numFrame);
 /* AI */
 void CreatureUpdateAI (SCreature* creature);
-
-/*static bool IsPlaceFree (float x, float y,
-                         bool checkAll,
-                         SLevelObject** obstacleLevelObject,
-                         SCreature** obstacleCreature);*/
 
 void CreaturesUpdateAndRender();

@@ -12,12 +12,8 @@ SCorpse* CorpseCreate (float x, float y, ubyte w, ubyte h, float timeToRemove, S
 {
     SCorpse* corpse = (SCorpse*) malloc (sizeof(SCorpse));
 
-    /* search place for body in physObjects array */
-    uint16 i = 0;
-    while ((physObjects[i] != NULL) && (i < MAX_PHYSOBJECTS_COUNT))
-        i++;
-    physObjects[i] = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_LEVEL);
-    corpse->physBodyIndex = i;
+    corpse->physBody = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_LEVEL);
+    ListAddElement (physObjects, corpse->physBody);
 
     corpse->timeToRemove = timeToRemove;
     corpse->_timeToRemove = 0.0f;
@@ -31,9 +27,8 @@ void CorpseDestroy (SCorpse** corpse)
     if (corpse == NULL || *corpse == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[(*corpse)->physBodyIndex];
-    if (physBody != NULL)
-        PhysObjectDestroy (&(physObjects[(*corpse)->physBodyIndex]));
+    if ((*corpse)->physBody != NULL)
+        ListDeleteElementByValue (physObjects, (*corpse)->physBody);
 
     free (*corpse);
     *corpse = NULL;
@@ -41,21 +36,21 @@ void CorpseDestroy (SCorpse** corpse)
 
 void CorpseClearAll ()
 {
-    for (uint16 i = 0; i < MAX_CREATURES_COUNT; i++)
+    for (SListElement* element = corpses->first; element; element = element->next)
     {
-        if (corpses[i] != NULL)
-            CorpseDestroy (&(corpses[i]));
+        if (element->value != NULL)
+            CorpseDestroy((SCorpse**) &element->value);
     }
+
+    ListClear (corpses);
 }
 
 void CorpseGetSdlRect (SCorpse* corpse, SDL_Rect* rect)
 {
-    if (corpse == NULL || rect == NULL)
+    if (corpse == NULL || corpse->physBody == NULL || rect == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[corpse->physBodyIndex];
-    if (physBody == NULL)
-        return;
+    SPhysObject* physBody = corpse->physBody;
 
     rect->x = (int)(physBody->pos.x - cameraPos.x);
     rect->y = (int)(physBody->pos.y - cameraPos.y);
@@ -74,41 +69,58 @@ SDL_Texture* CorpseGetTexture (SCorpse* corpse)
 
 void CorpsesUpdateAndRender ()
 {
+    if (corpses->first == NULL)
+        return;
+
     SCorpse* corpse;
-    for (uint16 i = 0; i < MAX_CREATURES_COUNT; i++)
+    SListElement* element = corpses->first;
+    while (element != NULL)
     {
-        corpse = corpses[i];
+        corpse = NULL;
+        if (element)
+            corpse = (SCorpse*) element->value;
 
         if (corpse != NULL)
         {
-            corpse->_timeToRemove += deltaTime;
+            SPhysObject* physBody = corpse->physBody;
 
-            /* remove if time out */
-            if (corpse->_timeToRemove >= corpse->timeToRemove)
-            {
-                CorpseDestroy (&(corpses[i]));
-                continue;
-            }
-
-            /* check edges of level */
-            SPhysObject* physBody = physObjects[corpse->physBodyIndex];
             if (physBody == NULL)
             {
-                CorpseDestroy (&(corpses[i]));
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (corpses, corpse);
+                element = nextElement;
+
                 continue;
             }
 
+            // check edges of level
             short xPos = (short)(physBody->pos.x + (physBody->w >> 1)) / BLOCK_SIZE;
             short yPos = (short)(physBody->pos.y + (physBody->h >> 1)) / BLOCK_SIZE;
-
-            if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-                yPos < 0 || yPos >= LEVEL_HEIGHT)
+            if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+                yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
             {
-                CorpseDestroy (&(corpses[i]));
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, physBody);
+                ListDeleteElementByValue (corpses, corpse);
+                element = nextElement;
+
                 continue;
             }
 
-            /* now draw... */
+
+            corpse->_timeToRemove += deltaTime;
+            // remove if time out
+            if (corpse->_timeToRemove >= corpse->timeToRemove)
+            {
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, physBody);
+                ListDeleteElementByValue (corpses, corpse);
+                element = nextElement;
+
+                continue;
+            }
+
+            // now draw
             if (corpse->texture != NULL)
             {
                 SDL_Rect rect;
@@ -119,5 +131,7 @@ void CorpsesUpdateAndRender ()
                     EngineRenderImage (corpse->texture, &rect, false);
             }
         }
+
+        element = element->next;
     }
 }

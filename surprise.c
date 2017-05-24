@@ -1,8 +1,14 @@
+#include <stdlib.h>
+#include <math.h>
+
+
 #include "engine.h"
 #include "sound.h"
 #include "physObj.h"
 #include "surprise.h"
 #include "player.h"
+
+
 
 SSurprise* SurpriseCreate (ESurpriseType surpriseType,
                            float x, float y,
@@ -18,12 +24,8 @@ SSurprise* SurpriseCreate (ESurpriseType surpriseType,
     surprise->texture = texture;
     surprise->xDir = 0;
 
-    /* search place for body in physObjects array */
-    uint16 i = 0;
-    while ((physObjects[i] != NULL) && (i < MAX_PHYSOBJECTS_COUNT))
-        i++;
-    physObjects[i] = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_ALL);
-    surprise->physBodyIndex = i;
+    surprise->physBody = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_ALL);
+    ListAddElement (physObjects, surprise->physBody);
 
     return surprise;
 }
@@ -33,9 +35,8 @@ void SurpriseDestroy (SSurprise** surprise)
     if (surprise == NULL || *surprise == NULL)
         return;
 
-    SPhysObject* physBody = physObjects [(*surprise)->physBodyIndex];
-    if (physBody != NULL)
-        PhysObjectDestroy(&(physObjects [(*surprise)->physBodyIndex]));
+    if ((*surprise)->physBody != NULL)
+        ListDeleteElementByValue (physObjects, (*surprise)->physBody);
 
     free (*surprise);
     *surprise = NULL;
@@ -43,41 +44,20 @@ void SurpriseDestroy (SSurprise** surprise)
 
 void SurpriseClearAll ()
 {
-    for (uint16 i = 0; i < MAX_SURPRISES_COUNT; i++)
+    for (SListElement* element = surprises->first; element; element = element->next)
     {
-        SurpriseDestroy (&(surprises[i]));
+        if (element->value != NULL)
+            SurpriseDestroy((SSurprise**) &element->value);
     }
-}
-
-void SurpriseUpdateState (SSurprise* surprise)
-{
-    if (surprise == NULL)
-        return;
-
-    SPhysObject* physBody = physObjects[surprise->physBodyIndex];
-    if (physBody == NULL)
-    {
-        for (uint16 i = 0; i < MAX_SURPRISES_COUNT; i++)
-            if (surprise == surprises[i])
-            {
-                SurpriseDestroy (&(surprises[i]));
-                return;
-            }
-    }
-
-    /* ограничение скорости движения физического тела */
-    if (abs(physBody->impulse.x) > surprise->moveSpeed)
-        physBody->impulse.x = (surprise->moveSpeed)*(surprise->xDir);
+    ListClear (surprises);
 }
 
 void SurpriseAddImpulse (SSurprise* surprise, float x, float y)
 {
-    if (surprise == NULL)
+    if (surprise == NULL || surprise->physBody == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[surprise->physBodyIndex];
-    if (physBody != NULL)
-        PhysObjectAddImpulse(physBody, x, y);
+    PhysObjectAddImpulse (surprise->physBody, x, y);
 }
 
 bool IsPlaceFreeForSurprise (float x, float y,
@@ -102,10 +82,16 @@ bool IsPlaceFreeForSurprise (float x, float y,
 
 void SurpriseUpdatePhysics (SSurprise* surprise)
 {
-    if ((surprise == NULL) || (surprise->moveSpeed == 0.0f))
+    if ((surprise == NULL) || (surprise->physBody == NULL) || (surprise->moveSpeed == 0.0f))
         return;
 
-    SPhysObject* physBody = physObjects[surprise->physBodyIndex];
+    // get physbody if this exists
+    SPhysObject* physBody = surprise->physBody;
+
+    // ограничение скорости движения физического тела
+    if (abs(physBody->impulse.x) > surprise->moveSpeed)
+        physBody->impulse.x = (surprise->moveSpeed)*(surprise->xDir);
+
     SLevelObject* obstacleLevelObject;
     SVector2f testPosition;
     bool isCollided;     /* было ли уже взаимодействие */
@@ -139,14 +125,10 @@ void SurpriseUpdatePhysics (SSurprise* surprise)
 
 bool SurpriseIsCollisionPhysObject (SSurprise* s1, SPhysObject* o2)
 {
-    if (s1 == NULL || o2 == NULL)
+    if (s1 == NULL || s1->physBody == NULL || o2 == NULL)
         return false;
 
-    SPhysObject* physBody = physObjects[s1->physBodyIndex];
-    if (physBody != NULL)
-        return (PhysObjectIsCollisionPhysObject (physBody, o2));
-    else
-        return false;
+    return (PhysObjectIsCollisionPhysObject (s1->physBody, o2));
 }
 
 bool SurpriseIsCollisionCreature (SSurprise* s1, SCreature* c2)
@@ -154,8 +136,9 @@ bool SurpriseIsCollisionCreature (SSurprise* s1, SCreature* c2)
     if (s1 == NULL || c2 == NULL)
         return false;
 
-    SPhysObject* physBody1 = physObjects[s1->physBodyIndex];
-    SPhysObject* physBody2 = physObjects[c2->physBodyIndex];
+    SPhysObject* physBody1 = s1->physBody;
+    SPhysObject* physBody2 = c2->physBody;
+
     if (physBody1 != NULL && physBody2 != NULL)
         return (PhysObjectIsCollisionPhysObject (physBody1, physBody2));
     else
@@ -164,24 +147,18 @@ bool SurpriseIsCollisionCreature (SSurprise* s1, SCreature* c2)
 
 bool SurpriseIsCollisionLevelObject (SSurprise* s1, SLevelObject* l2)
 {
-    if (s1 == NULL || l2 == NULL)
+    if (s1 == NULL || s1->physBody == NULL || l2 == NULL)
         return false;
 
-    SPhysObject* physBody = physObjects[s1->physBodyIndex];
-    if (physBody != NULL)
-        return (PhysObjectIsCollisionLevelObject (physBody, l2));
-    else
-        return false;
+    return (PhysObjectIsCollisionLevelObject (s1->physBody, l2));
 }
 
 void SurpriseGetSdlRect (SSurprise* surprise, SDL_Rect* rect)
 {
-    if (surprise == NULL || rect == NULL)
+    if (surprise == NULL || surprise->physBody == NULL || rect == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[surprise->physBodyIndex];
-    if (physBody == NULL)
-        return;
+    SPhysObject* physBody = surprise->physBody;
 
     rect->x = (int)(physBody->pos.x - cameraPos.x);
     rect->y = (int)(physBody->pos.y - cameraPos.y);
@@ -199,8 +176,10 @@ SDL_Texture* SurpriseGetTexture (SSurprise* surprise)
 
 void SurpriseUpdateAI (SSurprise* surprise)
 {
-    if (surprise == NULL)
+    if (surprise == NULL || surprise->physBody == NULL)
         return;
+
+    SPhysObject* physBody = surprise->physBody;
 
     if (surprise->moveSpeed != 0.0f)
     {
@@ -213,7 +192,7 @@ void SurpriseUpdateAI (SSurprise* surprise)
         }
 
         /* move... */
-        if (abs (physObjects[surprise->physBodyIndex]->impulse.x) < EPSILON)
+        if (abs (physBody->impulse.x) < EPSILON)
             SurpriseAddImpulse (surprise, surprise->xDir, 0.0f);
         SurpriseAddImpulse (surprise, (surprise->accelSpeed)*(surprise->xDir)*deltaTime, 0.0f);
     }
@@ -221,18 +200,48 @@ void SurpriseUpdateAI (SSurprise* surprise)
 
 void SurprisesUpdateAndRender ()
 {
-    SSurprise* surprise = NULL;
-    for (uint16 i = 0; i < MAX_SURPRISES_COUNT; i++)
+    if (surprises->first == NULL)
+        return;
+
+    SSurprise* surprise;
+    SListElement* element = surprises->first;
+    while (element != NULL)
     {
-        surprise = surprises[i];
+        surprise = NULL;
+        if (element)
+            surprise = (SSurprise*) element->value;
 
         if (surprise != NULL)
         {
-            SurpriseUpdateState (surprise);
             SurpriseUpdatePhysics (surprise);
             SurpriseUpdateAI (surprise);
 
-            /* player eat surprise? */
+            SPhysObject* physBody = surprise->physBody;
+
+            if (physBody == NULL)
+            {
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (surprises, surprise);
+                element = nextElement;
+
+                continue;
+            }
+
+            // check edges of level
+            short xPos = (short)(physBody->pos.x + (physBody->w >> 1)) / BLOCK_SIZE;
+            short yPos = (short)(physBody->pos.y + (physBody->h >> 1)) / BLOCK_SIZE;
+            if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+                yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
+            {
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, physBody);
+                ListDeleteElementByValue (surprises, surprise);
+                element = nextElement;
+
+                continue;
+            }
+
+            // player eat surprise?
             if (player != NULL)
             if (SurpriseIsCollisionCreature (surprise, player))
             {
@@ -250,22 +259,27 @@ void SurprisesUpdateAndRender ()
                         break;
                 }
 
-                SurpriseDestroy(&(surprises[i]));
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, physBody);
+                ListDeleteElementByValue (surprises, surprise);
+                element = nextElement;
 
                 continue;
             }
 
 
-            /* now draw */
+            // now draw
             if (surprise->texture != NULL)
             {
                 SDL_Rect rect;
                 SurpriseGetSdlRect(surprise, &rect);
-                /* if rect in screen range */
+                // if rect in screen range
                 if ((rect.x + rect.w) > 0 &&
                     (rect.x <= WINDOW_WIDTH))
                     EngineRenderImage (surprise->texture, &rect, false);
             }
         }
+
+        element = element->next;
     }
 }

@@ -1,6 +1,7 @@
 #include <time.h>
 
 #include "engine.h"
+#include "list.h"
 #include "sound.h"
 #include "texture.h"
 #include "level.h"
@@ -26,11 +27,19 @@ bool EngineStart()
     deltaTime = delayTime = 0.0f;
     fps = fpsCounter = 0;
 
-    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_TIMER) != 0)
+    //if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) != 0)
+    if (SDL_Init (SDL_INIT_VIDEO) != 0)
     {
         printf ("SDL_Init Error: %s\n", SDL_GetError());
         return false;
     }
+
+    /* create lists */
+    physObjects = ListCreate();
+    lumps       = ListCreate();
+    surprises   = ListCreate();
+    corpses     = ListCreate();
+    creatures   = ListCreate();
 
     return true;
 }
@@ -43,6 +52,13 @@ void EngineStop()
         SDL_DestroyRenderer (sdlRenderer);
 
     SDL_Quit();
+
+    /* free lists */
+    ListDestroy (&physObjects);
+    ListDestroy (&lumps);
+    ListDestroy (&surprises);
+    ListDestroy (&corpses);
+    ListDestroy (&creatures);
 
     printf ("SDL stopped.\n");
 }
@@ -69,6 +85,10 @@ bool EngineCreateRenderer (int index, unsigned long flags)
 
 bool EngineInitAudio()
 {
+    audioSystemLoaded = false;
+    if (SDL_Init (SDL_INIT_AUDIO) != 0)
+        return false;
+
     audioSystemLoaded = (Mix_OpenAudio (22050, MIX_DEFAULT_FORMAT, 2, 1024) >= 0);
     return audioSystemLoaded;
 }
@@ -78,19 +98,19 @@ SDL_Texture* EngineLoadTexture (const char* fileName)
     return IMG_LoadTexture(sdlRenderer, fileName);
 }
 
-SDL_Texture* EngineLoadTextureFromStrip (SDL_Texture* srcTexture, const SDL_Rect* srcRect)
+/*SDL_Texture* EngineLoadTextureFromStrip (SDL_Texture* srcTexture, const SDL_Rect* srcRect)
 {
     if (srcTexture == NULL || srcRect == NULL)
         return NULL;
 
-    /* prepare new SDL_Texture and rect */
+    // prepare new SDL_Texture and rect
     SDL_Texture* dstTexture = SDL_CreateTexture (sdlRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, srcRect->w, srcRect->h);
     SDL_Rect dstRect;
     dstRect.x = dstRect.y = 0;
     dstRect.w = srcRect->w;
     dstRect.h = srcRect->h;
 
-    /* render to new texture */
+    // render to new texture
     SDL_SetRenderTarget (sdlRenderer, dstTexture);
     //SDL_SetRenderDrawColor (sdlRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_SetRenderDrawColor (sdlRenderer, 0, 0, 0, 0);
@@ -102,7 +122,7 @@ SDL_Texture* EngineLoadTextureFromStrip (SDL_Texture* srcTexture, const SDL_Rect
     SDL_SetRenderTarget (sdlRenderer, NULL);
 
     return dstTexture;
-}
+}*/
 
 
 void EngineRenderClear()
@@ -178,5 +198,6 @@ void EngineClearAllInstances()
     LumpClearAll();
     SurpriseClearAll();
     PhysObjectClearAll();
+
     player = NULL;
 }

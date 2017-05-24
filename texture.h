@@ -13,7 +13,6 @@ typedef struct
 
 
 /* textures of level */
-//SDL_Texture* levelTextures[228];
 SDL_Texture* levelTextures;
 
 /* textures of player */
@@ -26,7 +25,7 @@ SDL_Texture* goombaTextures[3];
 SDL_Texture* surpriseTextures[2];
 
 /* misc textures */
-SDL_Texture* miscTextures[2];
+SDL_Texture* miscTextures[3];
 
 
 

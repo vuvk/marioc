@@ -3,16 +3,14 @@
 #include "SDL2/SDL.h"
 
 #include "defines.h"
+#include "list.h"
 //#include "vector2d.h"
 #include "physObj.h"
 
 
 typedef struct
 {
-    //SVector2f pos;          /* position */
-    //int w, h;               /* width-height */
-
-    unsigned short int physBodyIndex;
+    SPhysObject* physBody;
 
     float timeToRemove;     /* time before destroy */
     float _timeToRemove;    /* delay */
@@ -21,7 +19,7 @@ typedef struct
 } SCorpse;
 
 /* all corpses here */
-SCorpse* corpses[MAX_CREATURES_COUNT];
+SList* corpses;
 
 /* constructor|destructor */
 SCorpse* CorpseCreate (float x, float y, ubyte w, ubyte h, float timeToRemove, SDL_Texture* texture);

@@ -15,17 +15,15 @@ float delayDamage;
 
 void PlayerUpdate ()
 {
-    if (player == NULL)
+    if (player == NULL || player->physBody == NULL)
         return;
 
-    SPhysObject* physBody = physObjects [player->physBodyIndex];
-    if (physBody == NULL)
-        return;
+    SPhysObject* physBody = player->physBody;
 
     if (playerPrevHealth <= 0)
         playerPrevHealth = player->health;
 
-    if (playerCanDamaged)
+    //if (playerCanDamaged)
     if ((playerPrevHealth > player->health) && (player->health > 0))
     {
         playerCanDamaged = false;
@@ -49,7 +47,11 @@ void PlayerUpdate ()
     }
 
     if (player->health == 1)
+    {
         physBody->h = BLOCK_SIZE;
+        if (playerPrevHealth > 1)
+            physBody->pos.y += BLOCK_SIZE;
+    }
     if (player->health == 2)
         physBody->h = BLOCK_SIZE << 1;
 
@@ -78,8 +80,14 @@ void PlayerUpdate ()
                                            BLOCK_SIZE / 2, BLOCK_SIZE / 4,
                                            5.0f,
                                            true,
-                                           (miscTextures[0]),
+                                           miscTextures[0],
                                            4);
+                        LumpCreateSeveral (levelObject->center.x, levelObject->center.y,
+                                           BLOCK_SIZE / 8, BLOCK_SIZE / 8,
+                                           5.0f,
+                                           true,
+                                           miscTextures[2],
+                                           40);
 
                         /* delete block */
                         for (uint16 j = 0; j < LEVEL_HEIGHT; j++)
@@ -111,16 +119,14 @@ void PlayerUpdate ()
                     }
                     if (levelObject->levelObjectType == lotMushroomBox)
                     {
-                        uint16 i = 0;
-                        while ((surprises [i] != NULL) && (i < MAX_SURPRISES_COUNT - 1))
-                            i++;
                         SSurprise* surprise = SurpriseCreate (stMushroom,
                                                               levelObject->pos.x, levelObject->pos.y - BLOCK_SIZE,
                                                               BLOCK_SIZE, BLOCK_SIZE,
                                                               1.5f,
                                                               surpriseTextures[0]);
-                        physObjects[surprise->physBodyIndex]->collisionFlag = PHYSOBJ_COLLISION_WITH_LEVEL;
-                        surprises[i] = surprise;
+                        surprise->physBody->collisionFlag = PHYSOBJ_COLLISION_WITH_LEVEL;
+                        ListAddElement(surprises, surprise);
+
                     }
 
                     levelObject->pos.y = levelObject->startPos.y - (BLOCK_SIZE >> 2);
@@ -164,12 +170,10 @@ void PlayerUpdate ()
 
 void PlayerUpdateFrames ()
 {
-    if (player == NULL)
+    if (player == NULL || player->physBody == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[player->physBodyIndex];
-    if (physBody == NULL)
-        return;
+    SPhysObject* physBody = player->physBody;
 
     /* jump? */
     if (!physBody->isGrounded)

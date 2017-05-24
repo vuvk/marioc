@@ -6,11 +6,12 @@
 
 #pragma once
 
+#include "list.h"
 #include "level.h"
 
-#define PHYSOBJ_NO_COLLISION 0
+#define PHYSOBJ_NO_COLLISION         0
 #define PHYSOBJ_COLLISION_WITH_LEVEL 1
-#define PHYSOBJ_COLLISION_WITH_ALL 2
+#define PHYSOBJ_COLLISION_WITH_ALL   2
 
 typedef struct
 {
@@ -31,9 +32,8 @@ typedef struct
     bool isGrounded;
 } SPhysObject;
 
-
-SPhysObject* physObjects[MAX_PHYSOBJECTS_COUNT];
-
+/* набор всех физических тел в игре */
+SList* physObjects;
 
 SPhysObject* PhysObjectCreate (float x, float y, ubyte w, ubyte h, ubyte collisionFlag);
 void PhysObjectDestroy (SPhysObject** physObject);

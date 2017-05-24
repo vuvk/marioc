@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdlib.h>
 
 #include "defines.h"
 #include "vector2d.h"
@@ -46,12 +45,6 @@ void LevelObjectDestroy (SLevelObject** levelObject);
 
 /* загрузка уровня (наполнение массива level) */
 void LevelLoad (char* fileName);
-void LevelLoad_old ();
 void LevelClear ();
 
 void LevelUpdateAndRender ();
-
-
-/* check place */
-/*bool IsPlaceFree (float x, float y, bool checkAll, void** obstacle);
-bool IsPlaceFree (float x, float y, bool checkAll, SLevelObject** obstacleLevelObject, SCreature** obstacleCreature);*/

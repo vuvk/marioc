@@ -3,7 +3,9 @@
 #include "SDL2/SDL.h"
 
 #include "defines.h"
+#include "list.h"
 #include "level.h"
+#include "physObj.h"
 #include "creature.h"
 
 
@@ -18,7 +20,7 @@ typedef struct
 {
     ESurpriseType surpriseType;
 
-    unsigned short physBodyIndex;
+    SPhysObject* physBody;
 
     char xDir;           /* -1 влево 1 вправо*/
     float moveSpeed;     /* скорость движения максимальная */
@@ -30,7 +32,7 @@ typedef struct
 
 
 /* набор всех сюрпризов/бонусов */
-SSurprise* surprises [MAX_SURPRISES_COUNT];
+SList* surprises;
 
 /* имитация конструктора */
 SSurprise* SurpriseCreate (ESurpriseType surpriseType,
@@ -42,12 +44,8 @@ SSurprise* SurpriseCreate (ESurpriseType surpriseType,
 void SurpriseDestroy (SSurprise** surprise);
 void SurpriseClearAll ();
 
-void SurpriseUpdateState (SSurprise* surprise);
-
 /* обработка физики и движения */
 void SurpriseAddImpulse (SSurprise* surprise, float x, float y);
-//void SurpriseUpdatePhysics (SSurprise* surprise);
-//bool SurpriseContainsPoint (SSurprise* surprise, float x, float y);
 bool SurpriseIsCollisionPhysObject (SSurprise* s1, SPhysObject* o2);
 bool SurpriseIsCollisionCreature (SSurprise* s1, SCreature* c2);
 bool SurpriseIsCollisionLevelObject (SSurprise* s1, SLevelObject* l2);

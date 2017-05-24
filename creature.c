@@ -4,6 +4,7 @@
 #include "defines.h"
 #include "additions.h"
 #include "vector2d.h"
+#include "list.h"
 #include "texture.h"
 #include "sound.h"
 #include "creature.h"
@@ -25,15 +26,10 @@ SCreature* CreatureCreate (ECreatureType creatureType,
     creature->creatureType = creatureType;
     creature->health = health;
 
-    /* search place for body in physObjects array */
-    uint16 i = 0;
-    while ((physObjects[i] != NULL) && (i < MAX_PHYSOBJECTS_COUNT))
-        i++;
-    physObjects[i] = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_ALL);
-    creature->physBodyIndex = i;
+    creature->physBody = PhysObjectCreate (x, y, w, h, PHYSOBJ_COLLISION_WITH_ALL);
+    ListAddElement (physObjects, creature->physBody);
 
     creature->xDir = 0;
-
     creature->moveSpeed = moveSpeed;
     creature->accelSpeed = BLOCK_SIZE * 0.65f;
 
@@ -55,9 +51,8 @@ void CreatureDestroy (SCreature** creature)
     if (creature == NULL || *creature == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[(*creature)->physBodyIndex];
-    if (physBody != NULL)
-        PhysObjectDestroy (&(physObjects[(*creature)->physBodyIndex]));
+    if ((*creature)->physBody != NULL)
+        ListDeleteElementByValue (physObjects, (*creature)->physBody);
 
     free (*creature);
     *creature = NULL;
@@ -65,12 +60,13 @@ void CreatureDestroy (SCreature** creature)
 
 void CreatureClearAll ()
 {
-    for (uint16 i = 0; i < MAX_CREATURES_COUNT; i++)
+    for (SListElement* element = creatures->first; element; element = element->next)
     {
-        CreatureDestroy (&(creatures[i]));
+        if (element->value != NULL)
+            CreatureDestroy((SCreature**) &element->value);
     }
 
-    creaturesCount = 0;
+    ListClear (creatures);
 }
 
 void CreatureGetDamage (SCreature* creature, int damage)
@@ -87,7 +83,7 @@ void CreatureUpdateState (SCreature* creature)
         return;
 
     /* самовыпилиться, если за границей уровня */
-    SPhysObject* physBody = physObjects[creature->physBodyIndex];
+    SPhysObject* physBody = creature->physBody;
     if (physBody == NULL)
     {
         CreatureGetDamage (creature, 100);
@@ -96,8 +92,8 @@ void CreatureUpdateState (SCreature* creature)
 
     short xPos = (short)((physBody->center.x) / BLOCK_SIZE);
     short yPos = (short)((physBody->center.y) / BLOCK_SIZE);
-    if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-        yPos < 0 || yPos >= LEVEL_HEIGHT)
+    if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+        yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
     {
         CreatureGetDamage (creature, 100);
         return;
@@ -110,24 +106,18 @@ void CreatureUpdateState (SCreature* creature)
 
 void CreatureAddImpulse (SCreature* creature, float x, float y)
 {
-    if (creature == NULL)
+    if (creature == NULL || creature->physBody == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[creature->physBodyIndex];
-    if (physBody != NULL)
-        PhysObjectAddImpulse (physObjects[creature->physBodyIndex], x, y);
+    PhysObjectAddImpulse (creature->physBody, x, y);
 }
 
 bool CreatureContainsPoint (SCreature* creature, float x, float y)
 {
-    if (creature == NULL)
+    if (creature == NULL || creature->physBody == NULL)
         return false;
 
-    SPhysObject* physBody = physObjects[creature->physBodyIndex];
-    if (physBody != NULL)
-        return PhysObjectContainsPoint(physObjects[creature->physBodyIndex], x, y);
-    else
-        return false;
+    return PhysObjectContainsPoint (creature->physBody, x, y);
 }
 
 bool CreatureIsCollisionCreature (SCreature* c1, SCreature* c2)
@@ -135,8 +125,8 @@ bool CreatureIsCollisionCreature (SCreature* c1, SCreature* c2)
     if (c1 == NULL || c2 == NULL)
         return false;
 
-    SPhysObject* physBody1 = physObjects[c1->physBodyIndex];
-    SPhysObject* physBody2 = physObjects[c2->physBodyIndex];
+    SPhysObject* physBody1 = c1->physBody;
+    SPhysObject* physBody2 = c2->physBody;
 
     if (physBody1 != NULL && physBody2 != NULL)
         return (PhysObjectIsCollisionPhysObject(physBody1, physBody2));
@@ -146,14 +136,10 @@ bool CreatureIsCollisionCreature (SCreature* c1, SCreature* c2)
 
 bool CreatureIsCollisionLevelObject (SCreature* c1, SLevelObject* l2)
 {
-    if (c1 == NULL || l2 == NULL)
+    if (c1 == NULL || c1->physBody == NULL || l2 == NULL)
         return false;
 
-    SPhysObject* physBody = physObjects[c1->physBodyIndex];
-    if (physBody != NULL)
-        return (PhysObjectIsCollisionLevelObject(physBody, l2));
-    else
-        return false;
+    return (PhysObjectIsCollisionLevelObject (c1->physBody, l2));
 }
 
 bool IsPlaceFreeForCreature (float x, float y,
@@ -164,8 +150,8 @@ bool IsPlaceFreeForCreature (float x, float y,
     /* check elements of level */
     short xPos = (short)x / BLOCK_SIZE;
     short yPos = (short)y / BLOCK_SIZE;
-    if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-        yPos < 0 || yPos >= LEVEL_HEIGHT)
+    if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+        yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
         return false;
 
     SLevelObject* levelObject = level[yPos][xPos];
@@ -179,16 +165,14 @@ bool IsPlaceFreeForCreature (float x, float y,
     if (checkAll)
     {
         SCreature* creature;
-        for (uint16 i = 0; i < MAX_CREATURES_COUNT; i++)
+        for (SListElement* element = creatures->first; element; element = element->next)
         {
-            creature = creatures[i];
+            creature = (SCreature*) element->value;
+
             if (creature != NULL)
             {
-                SPhysObject* physBody = physObjects [creature->physBodyIndex];
-                if (physBody == NULL || physBody->collisionFlag < PHYSOBJ_COLLISION_WITH_ALL)
-                    return true;
-
-                if (CreatureContainsPoint(creature, x, y))
+                if (creature->physBody != NULL && creature->physBody->collisionFlag == PHYSOBJ_COLLISION_WITH_ALL)
+                if (CreatureContainsPoint (creature, x, y))
                 {
                     *obstacleCreature = creature;
                     return false;
@@ -203,10 +187,11 @@ bool IsPlaceFreeForCreature (float x, float y,
 
 void CreatureUpdatePhysics (SCreature* creature)
 {
-    if (creature == NULL)
+    if (creature == NULL || creature->physBody == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[creature->physBodyIndex];
+    SPhysObject* physBody = creature->physBody;
+
     SLevelObject* obstacleLevelObject;
     SCreature* obstacleCreature;
     SVector2f testPosition;
@@ -230,8 +215,8 @@ void CreatureUpdatePhysics (SCreature* creature)
         /* level edges check  */
         xPos = (short)testPosition.x / BLOCK_SIZE;
         yPos = (short)testPosition.y / BLOCK_SIZE;
-        if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-            yPos < 0 || yPos >= LEVEL_HEIGHT)
+        if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+            yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
         {
             CreatureGetDamage (creature, 100);
             return;
@@ -246,7 +231,10 @@ void CreatureUpdatePhysics (SCreature* creature)
                 if (creature != player)
                 {
                     if ((obstacleCreature == player) && (playerCanDamaged))
+                    {
                         CreatureGetDamage (player, 1);
+                        playerCanDamaged = false;
+                    }
 
                     //physBody->impulse.x *= -1;
                     physBody->impulse.x = 0.0f;
@@ -255,7 +243,10 @@ void CreatureUpdatePhysics (SCreature* creature)
                 else
                 {
                     if ((obstacleCreature != NULL) && (playerCanDamaged))
+                    {
                         CreatureGetDamage (player, 1);
+                        playerCanDamaged = false;
+                    }
                 }
 
                 isCollided = true;
@@ -281,8 +272,8 @@ void CreatureUpdatePhysics (SCreature* creature)
         /* level edges check  */
         xPos = (short)testPosition.x / BLOCK_SIZE;
         yPos = (short)testPosition.y / BLOCK_SIZE;
-        if (xPos < 0 || xPos >= LEVEL_WIDTH ||
-            yPos < 0 || yPos >= LEVEL_HEIGHT)
+        if (xPos < 0 || xPos > (LEVEL_WIDTH - 1) ||
+            yPos < 0 || yPos > (LEVEL_HEIGHT - 1))
         {
             CreatureGetDamage (creature, 100);
             return;
@@ -298,7 +289,7 @@ void CreatureUpdatePhysics (SCreature* creature)
                 if (creature != obstacleCreature)
                 {
                     /* jump, if obstacle is creature under you */
-                    if (physObjects[obstacleCreature->physBodyIndex]->center.y >= (physBody->pos.y + physBody->h))
+                    if (obstacleCreature->physBody->center.y >= (physBody->pos.y + physBody->h))
                     {
                         //creature->pos.y -= 1.0f;
                         physBody->impulse.y = 0.0f;
@@ -321,7 +312,7 @@ void CreatureUpdatePhysics (SCreature* creature)
 
 void CreatureUpdateAI (SCreature* creature)
 {
-    if (creature == NULL)
+    if (creature == NULL || creature->physBody == NULL)
         return;
 
     if (creature->moveSpeed != 0.0f)
@@ -335,7 +326,7 @@ void CreatureUpdateAI (SCreature* creature)
         }
 
         /* move... */
-        if (abs (physObjects[creature->physBodyIndex]->impulse.x) < EPSILON)
+        if (abs (creature->physBody->impulse.x) < EPSILON)
             CreatureAddImpulse (creature, creature->xDir, 0.0f);
         CreatureAddImpulse (creature, (creature->accelSpeed)*(creature->xDir)*deltaTime, 0.0f);
     }
@@ -387,12 +378,10 @@ void CreatureUpdateAnimation (SCreature* creature)
 
 void CreatureGetSdlRect (SCreature* creature, SDL_Rect* rect)
 {
-    if (creature == NULL || rect == NULL)
+    if (creature == NULL || creature->physBody == NULL || rect == NULL)
         return;
 
-    SPhysObject* physBody = physObjects[creature->physBodyIndex];
-    if (physBody == NULL)
-        return;
+    SPhysObject* physBody = creature->physBody;
 
     rect->x = (int)(physBody->pos.x - cameraPos.x);
     rect->y = (int)(physBody->pos.y - cameraPos.y);
@@ -409,10 +398,16 @@ SDL_Texture* CreatureGetTexture (SCreature* creature, int numFrame)
 
 void CreaturesUpdateAndRender ()
 {
-    SCreature* creature = NULL;
-    for (uint16 i = 0; i < MAX_CREATURES_COUNT; i++)
+    if (creatures->first == NULL)
+        return;
+
+    SCreature* creature;
+    SListElement* element = creatures->first;
+    while (element != NULL)
     {
-        creature = creatures[i];
+        creature = NULL;
+        if (element)
+            creature = (SCreature*) element->value;
 
         if (creature != NULL)
         {
@@ -423,31 +418,31 @@ void CreaturesUpdateAndRender ()
             if (creature != player)
                 CreatureUpdateAI (creature);
 
-            /* render! */
+            // render!
             SDL_Rect rect;
             CreatureGetSdlRect (creature, &rect);
-            /* if rect in screen range */
+            // if rect in screen range
             if ((rect.x + rect.w) > 0 &&
                 (rect.x <= WINDOW_WIDTH))
                 EngineRenderImage (CreatureGetTexture (creature, creature->curFrame), &rect, (creature->xDir < 0));
 
             if (creature->health <= 0)
             {
-                SPhysObject* physBody = physObjects[creature->physBodyIndex];
+                SPhysObject* physBody = creature->physBody;
                 if (physBody != NULL)
                 {
-                    /* create blood! */
+                    // create blood!
                     LumpCreateSeveral (physBody->center.x, physBody->center.y,
                                        BLOCK_SIZE / 4.0f, BLOCK_SIZE / 8.0f,
                                        5.0f,
                                        true,
-                                       (miscTextures[1]),
-                                       10);
+                                       miscTextures[1],
+                                       50);
 
-                    /* now create corpse*/
+                    // now create corpse
                     SCorpse* corpse = CorpseCreate(physBody->pos.x, physBody->pos.y,
                                                    physBody->w,     physBody->h,
-                                                   3.0f,
+                                                   15.0f,
                                                    NULL);
 
                     switch (creature->creatureType)
@@ -456,7 +451,7 @@ void CreaturesUpdateAndRender ()
                         {
                             corpse->texture = playerTextures[6];
 
-                            physBody = physObjects[corpse->physBodyIndex];
+                            physBody = corpse->physBody;
                             physBody->w = BLOCK_SIZE;
                             physBody->h = BLOCK_SIZE;
                             physBody->collisionFlag = PHYSOBJ_NO_COLLISION;
@@ -474,7 +469,7 @@ void CreaturesUpdateAndRender ()
                         {
                             corpse->texture = goombaTextures[2];
 
-                            physBody = physObjects[corpse->physBodyIndex];
+                            physBody = corpse->physBody;
                             physBody->collisionFlag = PHYSOBJ_COLLISION_WITH_LEVEL;
                             physBody->impulse.x = 0.0f;
                             physBody->impulse.y = 0.0f;
@@ -488,17 +483,22 @@ void CreaturesUpdateAndRender ()
                         }
                     }
 
-                    uint16 j = 0;
-                    while ((corpses[j] != NULL) && (j < MAX_CREATURES_COUNT))
-                        j++;
-                    corpses[j] = corpse;
+                    ListAddElement (corpses, corpse);
                 }
 
                 if (creature == player)
                     player = NULL;
 
-                CreatureDestroy (&(creatures[i]));
+
+                SListElement* nextElement = element->next;
+                ListDeleteElementByValue (physObjects, creature->physBody);
+                ListDeleteElementByValue (creatures, creature);
+                element = nextElement;
+
+                continue;
             }
         }
+
+        element = element->next;
     }
 }

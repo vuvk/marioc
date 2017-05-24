@@ -47,6 +47,7 @@ void LoadTextures()
     /* misc */
     TextureLoad (&miscTextures[0], "./media/tex/brick.png");
     TextureLoad (&miscTextures[1], "./media/tex/blood.png");
+    TextureLoad (&miscTextures[2], "./media/tex/dust.png");
 }
 
 void TextureArraySetColor (SDL_Texture** textures, const ubyte r, const ubyte g, const ubyte b, uint16 count)

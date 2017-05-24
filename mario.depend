@@ -10,7 +10,7 @@
 	"vector2d.h"
 	"creature.h"
 
-1492772027 h"
+1495101601 h"
 
 1492752751 d:\progs\src\c\mario\defines.h
 
@@ -21,7 +21,7 @@
 	"SDL2/SDL_image.h"
 	"defines.h"
 
-1494588931 "
+1495524876 "
 
 1476935976 d:\progs\src\c\mario\sdl2\sdl.h
 	"SDL_main.h"
@@ -270,7 +270,7 @@
 	"SDL_stdinc.h"
 	"SDL_error.h"
 
-1494479567 .h"
+1476935894 .h"
 
 1476935976 d:\progs\src\c\mario\sdl2\sdl_gesture.h
 	"SDL_stdinc.h"
@@ -677,7 +677,7 @@
 	"texture.h"
 	"level.h"
 
-1494415282 
+1495525216 
 
 1476935894 d:\progs\src\c\mario\inc\sdl2\sdl.h
 	"SDL_main.h"
@@ -1072,6 +1072,8 @@
 	"texture.h"
 	"creature.h"
 	"player.h"
+
+1495117443 
 
 1492857351 /home/vuvk/progs/c/mario/defines.h
 
@@ -2147,9 +2149,10 @@
 1492959923 source:/home/vuvk/progs/c/mario/player.c
 	"player.h"
 
-1495103607 source:d:\progs\src\c\marioc\engine.c
+1495603013 source:d:\progs\src\c\marioc\engine.c
 	<time.h>
 	"engine.h"
+	"list.h"
 	"sound.h"
 	"texture.h"
 	"level.h"
@@ -2160,7 +2163,7 @@
 	"surprise.h"
 	"player.h"
 
-1495093884 d:\progs\src\c\marioc\engine.h
+1495601107 d:\progs\src\c\marioc\engine.h
 	<stdio.h>
 	"SDL2/SDL.h"
 	"SDL2/SDL_mixer.h"
@@ -2502,23 +2505,22 @@
 	"begin_code.h"
 	"close_code.h"
 
-1495088994 d:\progs\src\c\marioc\defines.h
+1495601107 d:\progs\src\c\marioc\defines.h
 	"vector2d.h"
 
-1495082674 d:\progs\src\c\marioc\texture.h
+1495601107 d:\progs\src\c\marioc\texture.h
 	"SDL2/SDL.h"
 	"defines.h"
 	"engine.h"
 
-1495102727 d:\progs\src\c\marioc\level.h
-	<stdlib.h>
+1495602948 d:\progs\src\c\marioc\level.h
 	"defines.h"
 	"vector2d.h"
 
 1493702391 d:\progs\src\c\marioc\vector2d.h
 	"defines.h"
 
-1495103553 source:d:\progs\src\c\marioc\main.c
+1495604912 source:d:\progs\src\c\marioc\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -2541,15 +2543,16 @@
 	<stdio.h>
 	"defines.h"
 
-1495094228 d:\progs\src\c\marioc\creature.h
+1495601107 d:\progs\src\c\marioc\creature.h
 	"SDL2/SDL.h"
+	"list.h"
 	"level.h"
 	"physObj.h"
 
 1494847526 d:\progs\src\c\marioc\player.h
 	"creature.h"
 
-1495103583 source:d:\progs\src\c\marioc\player.c
+1495602649 source:d:\progs\src\c\marioc\player.c
 	<stdlib.h>
 	"defines.h"
 	"texture.h"
@@ -2561,17 +2564,18 @@
 	"surprise.h"
 	"player.h"
 
-1492772027 source:d:\progs\src\c\marioc\vector2d.c
+1495601734 source:d:\progs\src\c\marioc\vector2d.c
 	<math.h>
 	"defines.h"
 	"vector2d.h"
 
-1495103553 source:d:\progs\src\c\marioc\creature.c
+1495603110 source:d:\progs\src\c\marioc\creature.c
 	<stdlib.h>
 	<stdio.h>
 	"defines.h"
 	"additions.h"
 	"vector2d.h"
+	"list.h"
 	"texture.h"
 	"sound.h"
 	"creature.h"
@@ -2579,7 +2583,9 @@
 	"lump.h"
 	"player.h"
 
-1495102727 source:d:\progs\src\c\marioc\level.c
+1495612911 source:d:\progs\src\c\marioc\level.c
+	<stdlib.h>
+	<string.h>
 	"libxml/parser.h"
 	"additions.h"
 	"engine.h"
@@ -2590,28 +2596,33 @@
 	"surprise.h"
 	"player.h"
 
-1495103077 source:d:\progs\src\c\marioc\corpse.c
+1495603193 source:d:\progs\src\c\marioc\corpse.c
 	<stdio.h>
 	<stdlib.h>
 	"engine.h"
 	"vector2d.h"
 	"level.h"
+	"physObj.h"
 	"corpse.h"
 
-1495101017 d:\progs\src\c\marioc\corpse.h
+1495601107 d:\progs\src\c\marioc\corpse.h
 	"SDL2/SDL.h"
 	"defines.h"
+	"list.h"
 	"physObj.h"
 
-1495087085 source:d:\progs\src\c\marioc\physobj.c
+1495602699 source:d:\progs\src\c\marioc\physobj.c
+	<math.h>
+	<stdlib.h>
 	"defines.h"
 	"additions.h"
 	"physObj.h"
 
-1494498058 d:\progs\src\c\marioc\physobj.h
+1495601107 d:\progs\src\c\marioc\physobj.h
+	"list.h"
 	"level.h"
 
-1495117671 source:b:\mein_docs\programs\c\marioc\corpse.c
+1495539474 source:b:\mein_docs\programs\c\marioc\corpse.c
 	<stdio.h>
 	<stdlib.h>
 	"engine.h"
@@ -2620,20 +2631,20 @@
 	"physObj.h"
 	"corpse.h"
 
-1495102727 b:\mein_docs\programs\c\marioc\level.h
-	<stdlib.h>
+1495123390 b:\mein_docs\programs\c\marioc\level.h
 	"defines.h"
 	"vector2d.h"
 
-1495118137 b:\mein_docs\programs\c\marioc\defines.h
+1495559217 b:\mein_docs\programs\c\marioc\defines.h
 	"vector2d.h"
 
 1493702391 b:\mein_docs\programs\c\marioc\vector2d.h
 	"defines.h"
 
-1495101017 b:\mein_docs\programs\c\marioc\corpse.h
+1495534985 b:\mein_docs\programs\c\marioc\corpse.h
 	"SDL2/SDL.h"
 	"defines.h"
+	"list.h"
 	"physObj.h"
 
 1476935894 b:\mein_docs\programs\c\marioc\inc\sdl2\sdl.h
@@ -2955,15 +2966,17 @@
 	"begin_code.h"
 	"close_code.h"
 
-1494498058 b:\mein_docs\programs\c\marioc\physobj.h
+1495534887 b:\mein_docs\programs\c\marioc\physobj.h
+	"list.h"
 	"level.h"
 
-1495118610 source:b:\mein_docs\programs\c\marioc\creature.c
+1495559027 source:b:\mein_docs\programs\c\marioc\creature.c
 	<stdlib.h>
 	<stdio.h>
 	"defines.h"
 	"additions.h"
 	"vector2d.h"
+	"list.h"
 	"texture.h"
 	"sound.h"
 	"creature.h"
@@ -2971,22 +2984,24 @@
 	"lump.h"
 	"player.h"
 
-1495082674 b:\mein_docs\programs\c\marioc\texture.h
+1495559001 b:\mein_docs\programs\c\marioc\texture.h
 	"SDL2/SDL.h"
 	"defines.h"
 	"engine.h"
 
-1495094228 b:\mein_docs\programs\c\marioc\creature.h
+1495535406 b:\mein_docs\programs\c\marioc\creature.h
 	"SDL2/SDL.h"
+	"list.h"
 	"level.h"
 	"physObj.h"
 
 1494847526 b:\mein_docs\programs\c\marioc\player.h
 	"creature.h"
 
-1495118701 source:b:\mein_docs\programs\c\marioc\engine.c
+1495558668 source:b:\mein_docs\programs\c\marioc\engine.c
 	<time.h>
 	"engine.h"
+	"list.h"
 	"sound.h"
 	"texture.h"
 	"level.h"
@@ -2997,7 +3012,7 @@
 	"surprise.h"
 	"player.h"
 
-1495093884 b:\mein_docs\programs\c\marioc\engine.h
+1495525042 b:\mein_docs\programs\c\marioc\engine.h
 	<stdio.h>
 	"SDL2/SDL.h"
 	"SDL2/SDL_mixer.h"
@@ -3020,7 +3035,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1495117443 source:b:\mein_docs\programs\c\marioc\main.c
+1495558646 source:b:\mein_docs\programs\c\marioc\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -3043,12 +3058,14 @@
 	<stdio.h>
 	"defines.h"
 
-1495118609 source:b:\mein_docs\programs\c\marioc\physobj.c
+1495538261 source:b:\mein_docs\programs\c\marioc\physobj.c
+	<math.h>
+	<stdlib.h>
 	"defines.h"
 	"additions.h"
 	"physObj.h"
 
-1495117443 source:b:\mein_docs\programs\c\marioc\player.c
+1495559027 source:b:\mein_docs\programs\c\marioc\player.c
 	<stdlib.h>
 	"defines.h"
 	"texture.h"
@@ -3065,7 +3082,9 @@
 	"defines.h"
 	"vector2d.h"
 
-1495118502 source:b:\mein_docs\programs\c\marioc\level.c
+1495534115 source:b:\mein_docs\programs\c\marioc\level.c
+	<stdlib.h>
+	<string.h>
 	"libxml/parser.h"
 	"additions.h"
 	"engine.h"
@@ -3080,7 +3099,7 @@
 	"SDL2/SDL_mixer.h"
 	"defines.h"
 
-1493909142 mixer.h"
+1494581345 mixer.h"
 
 1495117472 source:b:\mein_docs\programs\c\marioc\sound.c
 	<stdio.h>
@@ -3091,17 +3110,17 @@
 	"SDL2/SDL_mixer.h"
 	"defines.h"
 
-1494856572 source:d:\progs\src\c\marioc\sound.c
+1495117472 source:d:\progs\src\c\marioc\sound.c
 	<stdio.h>
 	"sound.h"
 	"additions.h"
 
-1495084832 source:d:\progs\src\c\marioc\texture.c
+1495559001 source:d:\progs\src\c\marioc\texture.c
 	<stdio.h>
 	"additions.h"
 	"texture.h"
 
-1494586875 source:/home/vuvk/progs/c/marioc/corpse.c
+1495117671 source:/home/vuvk/progs/c/marioc/corpse.c
 	<stdio.h>
 	<stdlib.h>
 	"level.h"
@@ -3110,25 +3129,39 @@
 	<stdlib.h>
 	"level.h"
 	"corpse.h"
+	<stdio.h>
+	<stdlib.h>
+	"engine.h"
+	"vector2d.h"
+	"level.h"
+	"physObj.h"
+	"corpse.h"
 
-1494581990 /home/vuvk/progs/c/marioc/level.h
+1495123390 /home/vuvk/progs/c/marioc/level.h
 	<stdlib.h>
 	"defines.h"
 	"vector2d.h"
 	<stdlib.h>
 	"defines.h"
 	"vector2d.h"
+	"defines.h"
+	"vector2d.h"
 
-1494602936 /home/vuvk/progs/c/marioc/defines.h
+1495119145 /home/vuvk/progs/c/marioc/defines.h
+	"vector2d.h"
 
 1493702391 /home/vuvk/progs/c/marioc/vector2d.h
 	"defines.h"
 	"defines.h"
+	"defines.h"
 
-1494584584 /home/vuvk/progs/c/marioc/corpse.h
+1495101017 /home/vuvk/progs/c/marioc/corpse.h
 	"SDL2/SDL.h"
 	"defines.h"
 	"vector2d.h"
+	"physObj.h"
+	"SDL2/SDL.h"
+	"defines.h"
 	"physObj.h"
 	"SDL2/SDL.h"
 	"defines.h"
@@ -3138,8 +3171,9 @@
 	"defines.h"
 	"level.h"
 	"level.h"
+	"level.h"
 
-1494599264 source:/home/vuvk/progs/c/marioc/creature.c
+1495118610 source:/home/vuvk/progs/c/marioc/creature.c
 	<stdlib.h>
 	<stdio.h>
 	"defines.h"
@@ -3160,11 +3194,25 @@
 	"corpse.h"
 	"lump.h"
 	"player.h"
+	<stdlib.h>
+	<stdio.h>
+	"defines.h"
+	"additions.h"
+	"vector2d.h"
+	"texture.h"
+	"sound.h"
+	"creature.h"
+	"corpse.h"
+	"lump.h"
+	"player.h"
 
-1494484026 /home/vuvk/progs/c/marioc/texture.h
+1495082674 /home/vuvk/progs/c/marioc/texture.h
 	"SDL2/SDL.h"
 	"engine.h"
 	"SDL2/SDL.h"
+	"engine.h"
+	"SDL2/SDL.h"
+	"defines.h"
 	"engine.h"
 
 1476935894 /home/vuvk/progs/c/marioc/inc/SDL2/SDL.h
@@ -3719,12 +3767,18 @@
 	"begin_code.h"
 	"close_code.h"
 
-1494585884 /home/vuvk/progs/c/marioc/engine.h
+1495093884 /home/vuvk/progs/c/marioc/engine.h
 	<stdio.h>
 	"SDL2/SDL.h"
 	"SDL2/SDL_mixer.h"
 	"SDL2/SDL_image.h"
 	"defines.h"
+	<stdio.h>
+	"SDL2/SDL.h"
+	"SDL2/SDL_mixer.h"
+	"SDL2/SDL_image.h"
+	"defines.h"
+	"vector2d.h"
 	<stdio.h>
 	"SDL2/SDL.h"
 	"SDL2/SDL_mixer.h"
@@ -3758,23 +3812,29 @@
 	"begin_code.h"
 	"close_code.h"
 
-1494581345 /home/vuvk/progs/c/marioc/sound.h
+1495103619 /home/vuvk/progs/c/marioc/sound.h
 	"SDL2/SDL_mixer.h"
 	"SDL2/SDL_mixer.h"
+	"SDL2/SDL_mixer.h"
+	"defines.h"
 
-1494586115 /home/vuvk/progs/c/marioc/creature.h
+1495094228 /home/vuvk/progs/c/marioc/creature.h
 	"SDL2/SDL.h"
 	"level.h"
 	"physObj.h"
 	"SDL2/SDL.h"
 	"level.h"
 	"physObj.h"
+	"SDL2/SDL.h"
+	"level.h"
+	"physObj.h"
 
-1494414050 /home/vuvk/progs/c/marioc/player.h
+1494847526 /home/vuvk/progs/c/marioc/player.h
 	"creature.h"
 	"creature.h"
+	"creature.h"
 
-1494586091 source:/home/vuvk/progs/c/marioc/engine.c
+1495118701 source:/home/vuvk/progs/c/marioc/engine.c
 	<time.h>
 	"engine.h"
 	"texture.h"
@@ -3783,8 +3843,19 @@
 	"engine.h"
 	"texture.h"
 	"level.h"
+	<time.h>
+	"engine.h"
+	"sound.h"
+	"texture.h"
+	"level.h"
+	"physObj.h"
+	"creature.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
+	"player.h"
 
-1494586962 source:/home/vuvk/progs/c/marioc/level.c
+1495123876 source:/home/vuvk/progs/c/marioc/level.c
 	"level.h"
 	"texture.h"
 	"corpse.h"
@@ -3795,8 +3866,18 @@
 	"corpse.h"
 	"lump.h"
 	"player.h"
+	<stdlib.h>
+	"libxml/parser.h"
+	"additions.h"
+	"engine.h"
+	"level.h"
+	"texture.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
+	"player.h"
 
-1494586516 source:/home/vuvk/progs/c/marioc/main.c
+1495118843 source:/home/vuvk/progs/c/marioc/main.c
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
@@ -3823,6 +3904,23 @@
 	"creature.h"
 	"corpse.h"
 	"lump.h"
+	"physObj.h"
+	"player.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"SDL2/SDL.h"
+	"defines.h"
+	"additions.h"
+	"engine.h"
+	"texture.h"
+	"sound.h"
+	"vector2d.h"
+	"creature.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
 	"physObj.h"
 	"player.h"
 
@@ -3831,16 +3929,21 @@
 	"defines.h"
 	<stdio.h>
 	"defines.h"
+	<stdio.h>
+	"defines.h"
 
-1494500047 source:/home/vuvk/progs/c/marioc/physObj.c
+1495118609 source:/home/vuvk/progs/c/marioc/physObj.c
 	"physObj.h"
 	"defines.h"
 	"level.h"
 	"defines.h"
 	"additions.h"
 	"physObj.h"
+	"defines.h"
+	"additions.h"
+	"physObj.h"
 
-1494599317 source:/home/vuvk/progs/c/marioc/player.c
+1495117443 source:/home/vuvk/progs/c/marioc/player.c
 	"player.h"
 	"physObj.h"
 	<stdlib.h>
@@ -3851,14 +3954,30 @@
 	"corpse.h"
 	"lump.h"
 	"player.h"
+	<stdlib.h>
+	"defines.h"
+	"texture.h"
+	"sound.h"
+	"level.h"
+	"physObj.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
+	"player.h"
 
-1494581414 source:/home/vuvk/progs/c/marioc/sound.c
+1495117472 source:/home/vuvk/progs/c/marioc/sound.c
 	"sound.h"
 	<stdio.h>
 	"sound.h"
 	"additions.h"
+	<stdio.h>
+	"sound.h"
+	"additions.h"
 
-1494588005 source:/home/vuvk/progs/c/marioc/texture.c
+1495084832 source:/home/vuvk/progs/c/marioc/texture.c
+	"texture.h"
+	<stdio.h>
+	"additions.h"
 	"texture.h"
 	<stdio.h>
 	"additions.h"
@@ -3871,31 +3990,44 @@
 	<math.h>
 	"defines.h"
 	"vector2d.h"
+	<math.h>
+	"defines.h"
+	"vector2d.h"
 
 1494479567 source:d:\progs\src\c\marioc\additions.c
 	"additions.h"
 
-1495101601 source:d:\progs\src\c\marioc\lump.c
+1495602836 source:d:\progs\src\c\marioc\lump.c
+	<stdio.h>
+	<stdlib.h>
+	"defines.h"
+	"engine.h"
+	"level.h"
+	"lump.h"
+
+1495601107 d:\progs\src\c\marioc\lump.h
+	"SDL2/SDL.h"
+	"list.h"
+	"physObj.h"
+
+1494479567 source:/home/vuvk/progs/c/marioc/additions.c
+	"additions.h"
+	"additions.h"
+
+1495101264 /home/vuvk/progs/c/marioc/lump.h
+	"SDL2/SDL.h"
+	"defines.h"
+	"physObj.h"
+	"SDL2/SDL.h"
+	"defines.h"
+	"physObj.h"
+
+1495101601 source:/home/vuvk/progs/c/marioc/lump.c
 	<stdio.h>
 	<stdlib.h>
 	"engine.h"
 	"level.h"
 	"lump.h"
-
-1495101264 d:\progs\src\c\marioc\lump.h
-	"SDL2/SDL.h"
-	"defines.h"
-	"physObj.h"
-
-1494479567 source:/home/vuvk/progs/c/marioc/additions.c
-	"additions.h"
-
-1494598615 /home/vuvk/progs/c/marioc/lump.h
-	"SDL2/SDL.h"
-	"defines.h"
-	"physObj.h"
-
-1494602249 source:/home/vuvk/progs/c/marioc/lump.c
 	<stdio.h>
 	<stdlib.h>
 	"engine.h"
@@ -3905,43 +4037,52 @@
 1494479567 source:b:\mein_docs\programs\c\marioc\additions.c
 	"additions.h"
 
-1495101264 b:\mein_docs\programs\c\marioc\lump.h
+1495537008 b:\mein_docs\programs\c\marioc\lump.h
 	"SDL2/SDL.h"
-	"defines.h"
+	"list.h"
 	"physObj.h"
 
-1495101601 source:b:\mein_docs\programs\c\marioc\lump.c
+1495539489 source:b:\mein_docs\programs\c\marioc\lump.c
 	<stdio.h>
 	<stdlib.h>
+	"defines.h"
 	"engine.h"
 	"level.h"
 	"lump.h"
 
-1495084832 source:b:\mein_docs\programs\c\marioc\texture.c
+1495559001 source:b:\mein_docs\programs\c\marioc\texture.c
 	<stdio.h>
 	"additions.h"
 	"texture.h"
 
-1495103583 source:d:\progs\src\c\marioc\surprise.c
+1495601734 source:d:\progs\src\c\marioc\surprise.c
+	<stdlib.h>
+	<math.h>
 	"engine.h"
 	"sound.h"
 	"physObj.h"
 	"surprise.h"
 	"player.h"
 
-1495101601 d:\progs\src\c\marioc\surprise.h
+1495601107 d:\progs\src\c\marioc\surprise.h
 	"SDL2/SDL.h"
 	"defines.h"
+	"list.h"
 	"level.h"
+	"physObj.h"
 	"creature.h"
 
-1495101601 b:\mein_docs\programs\c\marioc\surprise.h
+1495538502 b:\mein_docs\programs\c\marioc\surprise.h
 	"SDL2/SDL.h"
 	"defines.h"
+	"list.h"
 	"level.h"
+	"physObj.h"
 	"creature.h"
 
-1495117443 source:b:\mein_docs\programs\c\marioc\surprise.c
+1495539080 source:b:\mein_docs\programs\c\marioc\surprise.c
+	<stdlib.h>
+	<math.h>
 	"engine.h"
 	"sound.h"
 	"physObj.h"
@@ -4296,9 +4437,13 @@
 	<libxml/xmlIO.h>
 	<libxml/globals.h>
 
+1494999695 obals.h>
+
 1494999696 d:\progs\src\c\marioc\include\libxml\xmlversion.h
 	<libxml/xmlexports.h>
 	<ansidecl.h>
+
+1494999696 h>
 
 1494999696 d:\progs\src\c\marioc\include\libxml\xmlexports.h
 
@@ -4309,18 +4454,26 @@
 	<libxml/xmlregexp.h>
 	<libxml/xmlmemory.h>
 
+1494999696 lmemory.h>
+
 1494999696 d:\progs\src\c\marioc\include\libxml\xmlstring.h
 	<stdarg.h>
 	<libxml/xmlversion.h>
+
+1494999695 lversion.h>
 
 1494999696 d:\progs\src\c\marioc\include\libxml\xmlregexp.h
 	<libxml/xmlversion.h>
 	<libxml/tree.h>
 	<libxml/dict.h>
 
+1494999695 ct.h>
+
 1494999695 d:\progs\src\c\marioc\include\libxml\dict.h
 	<libxml/xmlversion.h>
 	<libxml/tree.h>
+
+1494999695 ee.h>
 
 1494999696 d:\progs\src\c\marioc\include\libxml\xmlmemory.h
 	<stdio.h>
@@ -4341,8 +4494,12 @@
 	<libxml/xmlmemory.h>
 	<libxml/threads.h>
 
+1494999695 reads.h>
+
 1494999696 d:\progs\src\c\marioc\include\libxml\xmlerror.h
 	<libxml/parser.h>
+
+1494999696 rser.h>
 
 1494999695 d:\progs\src\c\marioc\include\libxml\sax.h
 	<stdio.h>
@@ -4350,6 +4507,8 @@
 	<libxml/xmlversion.h>
 	<libxml/parser.h>
 	<libxml/xlink.h>
+
+1494999695 ink.h>
 
 1494999696 d:\progs\src\c\marioc\include\libxml\xlink.h
 	<libxml/xmlversion.h>
@@ -4374,6 +4533,8 @@
 	<libxml/list.h>
 	<libxml/xmlautomata.h>
 	<libxml/xmlregexp.h>
+
+1494999696 lregexp.h>
 
 1494999695 d:\progs\src\c\marioc\include\libxml\list.h
 	<libxml/xmlversion.h>
@@ -4405,6 +4566,8 @@
 	<libxml/tree.h>
 	<libxml/parser.h>
 	<libxml/encoding.h>
+
+1494999696 coding.h>
 
 1476935894 b:\mein_docs\programs\c\marioc\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -5490,6 +5653,1145 @@
 	"texture.h"
 
 1492772027 source:f:\progs\src\c\marioc\vector2d.c
+	<math.h>
+	"defines.h"
+	"vector2d.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL.h
+	"SDL_main.h"
+	"SDL_stdinc.h"
+	"SDL_assert.h"
+	"SDL_atomic.h"
+	"SDL_audio.h"
+	"SDL_clipboard.h"
+	"SDL_cpuinfo.h"
+	"SDL_endian.h"
+	"SDL_error.h"
+	"SDL_events.h"
+	"SDL_filesystem.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_haptic.h"
+	"SDL_hints.h"
+	"SDL_loadso.h"
+	"SDL_log.h"
+	"SDL_messagebox.h"
+	"SDL_mutex.h"
+	"SDL_power.h"
+	"SDL_render.h"
+	"SDL_rwops.h"
+	"SDL_system.h"
+	"SDL_thread.h"
+	"SDL_timer.h"
+	"SDL_version.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_main.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_stdinc.h
+	"SDL_config.h"
+	<sys/types.h>
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<stdarg.h>
+	<stdlib.h>
+	<malloc.h>
+	<stddef.h>
+	<stdarg.h>
+	<memory.h>
+	<string.h>
+	<strings.h>
+	<inttypes.h>
+	<stdint.h>
+	<ctype.h>
+	<math.h>
+	<float.h>
+	<sal.h>
+	"begin_code.h"
+	<alloca.h>
+	<malloc.h>
+	<malloc.h>
+	<malloc.h>
+	<stdlib.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_config.h
+	"SDL_platform.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_platform.h
+	"AvailabilityMacros.h"
+	"TargetConditionals.h"
+	<winapifamily.h>
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/begin_code.h
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/close_code.h
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_assert.h
+	"SDL_config.h"
+	"begin_code.h"
+	<signal.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_atomic.h
+	"SDL_stdinc.h"
+	"SDL_platform.h"
+	"begin_code.h"
+	<mbarrier.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_audio.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_endian.h"
+	"SDL_mutex.h"
+	"SDL_thread.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_error.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_endian.h
+	"SDL_stdinc.h"
+	<endian.h>
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_mutex.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_thread.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_atomic.h"
+	"SDL_mutex.h"
+	"begin_code.h"
+	<process.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_rwops.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_clipboard.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_cpuinfo.h
+	"SDL_stdinc.h"
+	<intrin.h>
+	<intrin.h>
+	<altivec.h>
+	<mmintrin.h>
+	<mm3dnow.h>
+	<xmmintrin.h>
+	<emmintrin.h>
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_events.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_keyboard.h"
+	"SDL_mouse.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_quit.h"
+	"SDL_gesture.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_video.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_pixels.h
+	"SDL_stdinc.h"
+	"SDL_endian.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_rect.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_pixels.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_surface.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_blendmode.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_blendmode.h
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_keyboard.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_keycode.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_keycode.h
+	"SDL_stdinc.h"
+	"SDL_scancode.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_scancode.h
+	"SDL_stdinc.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_mouse.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_joystick.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_gamecontroller.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_rwops.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_quit.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_gesture.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_touch.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_filesystem.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_haptic.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_hints.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_loadso.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_log.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_messagebox.h
+	"SDL_stdinc.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_power.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_render.h
+	"SDL_stdinc.h"
+	"SDL_rect.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_system.h
+	"SDL_stdinc.h"
+	"SDL_keyboard.h"
+	"SDL_render.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_timer.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_version.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1451801791 /home/vuvk/progs/c/marioc/include/SDL2/SDL_mixer.h
+	"SDL_stdinc.h"
+	"SDL_rwops.h"
+	"SDL_audio.h"
+	"SDL_endian.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
+1451800374 /home/vuvk/progs/c/marioc/include/SDL2/SDL_image.h
+	"SDL.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
+1495101601 /home/vuvk/progs/c/marioc/surprise.h
+	"SDL2/SDL.h"
+	"defines.h"
+	"level.h"
+	"creature.h"
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/parser.h
+	<stdarg.h>
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+	<libxml/dict.h>
+	<libxml/hash.h>
+	<libxml/valid.h>
+	<libxml/entities.h>
+	<libxml/xmlerror.h>
+	<libxml/xmlstring.h>
+	<libxml/encoding.h>
+	<libxml/xmlIO.h>
+	<libxml/globals.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlversion.h
+	<libxml/xmlexports.h>
+	<ansidecl.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlexports.h
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/tree.h
+	<stdio.h>
+	<libxml/xmlversion.h>
+	<libxml/xmlstring.h>
+	<libxml/xmlregexp.h>
+	<libxml/xmlmemory.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlstring.h
+	<stdarg.h>
+	<libxml/xmlversion.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlregexp.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+	<libxml/dict.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/dict.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlmemory.h
+	<stdio.h>
+	<libxml/xmlversion.h>
+	<libxml/threads.h>
+	<libxml/globals.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/threads.h
+	<libxml/xmlversion.h>
+	<libxml/globals.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/globals.h
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/xmlerror.h>
+	<libxml/SAX.h>
+	<libxml/SAX2.h>
+	<libxml/xmlmemory.h>
+	<libxml/threads.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlerror.h
+	<libxml/parser.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/SAX.h
+	<stdio.h>
+	<stdlib.h>
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/xlink.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xlink.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/SAX2.h
+	<stdio.h>
+	<stdlib.h>
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/xlink.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/hash.h
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/dict.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/valid.h
+	<libxml/xmlversion.h>
+	<libxml/xmlerror.h>
+	<libxml/tree.h>
+	<libxml/list.h>
+	<libxml/xmlautomata.h>
+	<libxml/xmlregexp.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/list.h
+	<libxml/xmlversion.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlautomata.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+	<libxml/xmlregexp.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/entities.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/encoding.h
+	<libxml/xmlversion.h>
+	<iconv.h>
+	<unicode/ucnv.h>
+	<libxml/tree.h>
+
+1495007287 /home/vuvk/progs/c/marioc/include/iconv.h
+	"iconv.h"
+	<stddef.h>
+	<errno.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlIO.h
+	<stdio.h>
+	<libxml/xmlversion.h>
+	<libxml/globals.h>
+	<libxml/tree.h>
+	<libxml/parser.h>
+	<libxml/encoding.h>
+
+1495117443 source:/home/vuvk/progs/c/marioc/surprise.c
+	"engine.h"
+	"sound.h"
+	"physObj.h"
+	"surprise.h"
+	"player.h"
+
+1495524876 d:\progs\src\c\marioc\list.h
+	"defines.h"
+
+1495602948 source:d:\progs\src\c\marioc\list.c
+	<stdio.h>
+	<stdlib.h>
+	"list.h"
+
+1495524876 b:\mein_docs\programs\c\marioc\list.h
+	"defines.h"
+
+1495525216 source:b:\mein_docs\programs\c\marioc\list.c
+	<stdio.h>
+	<stdlib.h>
+	"list.h"
+
+1494479567 source:/home/vuvk/progs/c/marioc/additions.c
+	"additions.h"
+
+1494479567 /home/vuvk/progs/c/marioc/additions.h
+	<stdio.h>
+	"defines.h"
+
+1495601107 /home/vuvk/progs/c/marioc/defines.h
+	"vector2d.h"
+
+1493702391 /home/vuvk/progs/c/marioc/vector2d.h
+	"defines.h"
+
+1495603193 source:/home/vuvk/progs/c/marioc/corpse.c
+	<stdio.h>
+	<stdlib.h>
+	"engine.h"
+	"vector2d.h"
+	"level.h"
+	"physObj.h"
+	"corpse.h"
+
+1495601107 /home/vuvk/progs/c/marioc/engine.h
+	<stdio.h>
+	"SDL2/SDL.h"
+	"SDL2/SDL_mixer.h"
+	"SDL2/SDL_image.h"
+	"defines.h"
+	"vector2d.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL.h
+	"SDL_main.h"
+	"SDL_stdinc.h"
+	"SDL_assert.h"
+	"SDL_atomic.h"
+	"SDL_audio.h"
+	"SDL_clipboard.h"
+	"SDL_cpuinfo.h"
+	"SDL_endian.h"
+	"SDL_error.h"
+	"SDL_events.h"
+	"SDL_filesystem.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_haptic.h"
+	"SDL_hints.h"
+	"SDL_loadso.h"
+	"SDL_log.h"
+	"SDL_messagebox.h"
+	"SDL_mutex.h"
+	"SDL_power.h"
+	"SDL_render.h"
+	"SDL_rwops.h"
+	"SDL_system.h"
+	"SDL_thread.h"
+	"SDL_timer.h"
+	"SDL_version.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_main.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_stdinc.h
+	"SDL_config.h"
+	<sys/types.h>
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<stdarg.h>
+	<stdlib.h>
+	<malloc.h>
+	<stddef.h>
+	<stdarg.h>
+	<memory.h>
+	<string.h>
+	<strings.h>
+	<inttypes.h>
+	<stdint.h>
+	<ctype.h>
+	<math.h>
+	<float.h>
+	<sal.h>
+	"begin_code.h"
+	<alloca.h>
+	<malloc.h>
+	<malloc.h>
+	<malloc.h>
+	<stdlib.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_config.h
+	"SDL_platform.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_platform.h
+	"AvailabilityMacros.h"
+	"TargetConditionals.h"
+	<winapifamily.h>
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/begin_code.h
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/close_code.h
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_assert.h
+	"SDL_config.h"
+	"begin_code.h"
+	<signal.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_atomic.h
+	"SDL_stdinc.h"
+	"SDL_platform.h"
+	"begin_code.h"
+	<mbarrier.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_audio.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_endian.h"
+	"SDL_mutex.h"
+	"SDL_thread.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_error.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_endian.h
+	"SDL_stdinc.h"
+	<endian.h>
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_mutex.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_thread.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_atomic.h"
+	"SDL_mutex.h"
+	"begin_code.h"
+	<process.h>
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_rwops.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_clipboard.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_cpuinfo.h
+	"SDL_stdinc.h"
+	<intrin.h>
+	<intrin.h>
+	<altivec.h>
+	<mmintrin.h>
+	<mm3dnow.h>
+	<xmmintrin.h>
+	<emmintrin.h>
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_events.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_keyboard.h"
+	"SDL_mouse.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_quit.h"
+	"SDL_gesture.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_video.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_surface.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_pixels.h
+	"SDL_stdinc.h"
+	"SDL_endian.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_rect.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_pixels.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_surface.h
+	"SDL_stdinc.h"
+	"SDL_pixels.h"
+	"SDL_rect.h"
+	"SDL_blendmode.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_blendmode.h
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_keyboard.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_keycode.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_keycode.h
+	"SDL_stdinc.h"
+	"SDL_scancode.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_scancode.h
+	"SDL_stdinc.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_mouse.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_joystick.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_gamecontroller.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_rwops.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_quit.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_gesture.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"SDL_touch.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_touch.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_filesystem.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_haptic.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_joystick.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_hints.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_loadso.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_log.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_messagebox.h
+	"SDL_stdinc.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_power.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_render.h
+	"SDL_stdinc.h"
+	"SDL_rect.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_system.h
+	"SDL_stdinc.h"
+	"SDL_keyboard.h"
+	"SDL_render.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_timer.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1476935894 /home/vuvk/progs/c/marioc/include/SDL2/SDL_version.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1451801791 /home/vuvk/progs/c/marioc/include/SDL2/SDL_mixer.h
+	"SDL_stdinc.h"
+	"SDL_rwops.h"
+	"SDL_audio.h"
+	"SDL_endian.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
+1451800374 /home/vuvk/progs/c/marioc/include/SDL2/SDL_image.h
+	"SDL.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
+1495602948 /home/vuvk/progs/c/marioc/level.h
+	"defines.h"
+	"vector2d.h"
+
+1495601107 /home/vuvk/progs/c/marioc/physObj.h
+	"list.h"
+	"level.h"
+
+1495524876 /home/vuvk/progs/c/marioc/list.h
+	"defines.h"
+
+1495601107 /home/vuvk/progs/c/marioc/corpse.h
+	"SDL2/SDL.h"
+	"defines.h"
+	"list.h"
+	"physObj.h"
+
+1495603110 source:/home/vuvk/progs/c/marioc/creature.c
+	<stdlib.h>
+	<stdio.h>
+	"defines.h"
+	"additions.h"
+	"vector2d.h"
+	"list.h"
+	"texture.h"
+	"sound.h"
+	"creature.h"
+	"corpse.h"
+	"lump.h"
+	"player.h"
+
+1495601107 /home/vuvk/progs/c/marioc/texture.h
+	"SDL2/SDL.h"
+	"defines.h"
+	"engine.h"
+
+1495103619 /home/vuvk/progs/c/marioc/sound.h
+	"SDL2/SDL_mixer.h"
+	"defines.h"
+
+1495601107 /home/vuvk/progs/c/marioc/creature.h
+	"SDL2/SDL.h"
+	"list.h"
+	"level.h"
+	"physObj.h"
+
+1495601107 /home/vuvk/progs/c/marioc/lump.h
+	"SDL2/SDL.h"
+	"list.h"
+	"physObj.h"
+
+1494847526 /home/vuvk/progs/c/marioc/player.h
+	"creature.h"
+
+1495603013 source:/home/vuvk/progs/c/marioc/engine.c
+	<time.h>
+	"engine.h"
+	"list.h"
+	"sound.h"
+	"texture.h"
+	"level.h"
+	"physObj.h"
+	"creature.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
+	"player.h"
+
+1495601107 /home/vuvk/progs/c/marioc/surprise.h
+	"SDL2/SDL.h"
+	"defines.h"
+	"list.h"
+	"level.h"
+	"physObj.h"
+	"creature.h"
+
+1495613392 source:/home/vuvk/progs/c/marioc/level.c
+	<stdlib.h>
+	<string.h>
+	"libxml/parser.h"
+	"additions.h"
+	"engine.h"
+	"level.h"
+	"texture.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
+	"player.h"
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/parser.h
+	<stdarg.h>
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+	<libxml/dict.h>
+	<libxml/hash.h>
+	<libxml/valid.h>
+	<libxml/entities.h>
+	<libxml/xmlerror.h>
+	<libxml/xmlstring.h>
+	<libxml/encoding.h>
+	<libxml/xmlIO.h>
+	<libxml/globals.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlversion.h
+	<libxml/xmlexports.h>
+	<ansidecl.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlexports.h
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/tree.h
+	<stdio.h>
+	<libxml/xmlversion.h>
+	<libxml/xmlstring.h>
+	<libxml/xmlregexp.h>
+	<libxml/xmlmemory.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlstring.h
+	<stdarg.h>
+	<libxml/xmlversion.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlregexp.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+	<libxml/dict.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/dict.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlmemory.h
+	<stdio.h>
+	<libxml/xmlversion.h>
+	<libxml/threads.h>
+	<libxml/globals.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/threads.h
+	<libxml/xmlversion.h>
+	<libxml/globals.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/globals.h
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/xmlerror.h>
+	<libxml/SAX.h>
+	<libxml/SAX2.h>
+	<libxml/xmlmemory.h>
+	<libxml/threads.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlerror.h
+	<libxml/parser.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/SAX.h
+	<stdio.h>
+	<stdlib.h>
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/xlink.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xlink.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/SAX2.h
+	<stdio.h>
+	<stdlib.h>
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/xlink.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/hash.h
+	<libxml/xmlversion.h>
+	<libxml/parser.h>
+	<libxml/dict.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/valid.h
+	<libxml/xmlversion.h>
+	<libxml/xmlerror.h>
+	<libxml/tree.h>
+	<libxml/list.h>
+	<libxml/xmlautomata.h>
+	<libxml/xmlregexp.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/list.h
+	<libxml/xmlversion.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlautomata.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+	<libxml/xmlregexp.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/entities.h
+	<libxml/xmlversion.h>
+	<libxml/tree.h>
+
+1494999695 /home/vuvk/progs/c/marioc/include/libxml/encoding.h
+	<libxml/xmlversion.h>
+	<iconv.h>
+	<unicode/ucnv.h>
+	<libxml/tree.h>
+
+1495007287 /home/vuvk/progs/c/marioc/include/iconv.h
+	"iconv.h"
+	<stddef.h>
+	<errno.h>
+
+1494999696 /home/vuvk/progs/c/marioc/include/libxml/xmlIO.h
+	<stdio.h>
+	<libxml/xmlversion.h>
+	<libxml/globals.h>
+	<libxml/tree.h>
+	<libxml/parser.h>
+	<libxml/encoding.h>
+
+1495602948 source:/home/vuvk/progs/c/marioc/list.c
+	<stdio.h>
+	<stdlib.h>
+	"list.h"
+
+1495602836 source:/home/vuvk/progs/c/marioc/lump.c
+	<stdio.h>
+	<stdlib.h>
+	"defines.h"
+	"engine.h"
+	"level.h"
+	"lump.h"
+
+1495604912 source:/home/vuvk/progs/c/marioc/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"SDL2/SDL.h"
+	"defines.h"
+	"additions.h"
+	"engine.h"
+	"texture.h"
+	"sound.h"
+	"vector2d.h"
+	"creature.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
+	"physObj.h"
+	"player.h"
+
+1495602699 source:/home/vuvk/progs/c/marioc/physObj.c
+	<math.h>
+	<stdlib.h>
+	"defines.h"
+	"additions.h"
+	"physObj.h"
+
+1495602649 source:/home/vuvk/progs/c/marioc/player.c
+	<stdlib.h>
+	"defines.h"
+	"texture.h"
+	"sound.h"
+	"level.h"
+	"physObj.h"
+	"corpse.h"
+	"lump.h"
+	"surprise.h"
+	"player.h"
+
+1495117472 source:/home/vuvk/progs/c/marioc/sound.c
+	<stdio.h>
+	"sound.h"
+	"additions.h"
+
+1495601734 source:/home/vuvk/progs/c/marioc/surprise.c
+	<stdlib.h>
+	<math.h>
+	"engine.h"
+	"sound.h"
+	"physObj.h"
+	"surprise.h"
+	"player.h"
+
+1495559001 source:/home/vuvk/progs/c/marioc/texture.c
+	<stdio.h>
+	"additions.h"
+	"texture.h"
+
+1495601734 source:/home/vuvk/progs/c/marioc/vector2d.c
 	<math.h>
 	"defines.h"
 	"vector2d.h"
